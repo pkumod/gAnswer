@@ -261,6 +261,7 @@ public class GAnswer {
 		String[] varLineContents = rawLines[0].split("\t");
 		int varNum = varLineContents.length;
 		ret.answers = new String[ansNum][varNum];
+		ret.answersNum = ansNum;
 		
 		System.out.println("ansNum=" + ansNum);
 		System.out.println("varNum=" + varNum);
