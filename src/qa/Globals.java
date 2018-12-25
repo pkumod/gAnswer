@@ -27,6 +27,10 @@ public class Globals {
 	// entity linking system
 	public static DBpediaLookup dblk;
 	public static int MaxAnswerNum = 100;
+	public static String Dataset = "dbpedia 2016";
+	public static String DictionaryPath = "default";
+	public static String Version = "0.1.2";
+	public static String GDBsystem = "gStore v0.7.2";
 	
 	/*
 	 * evaluationMethod:
