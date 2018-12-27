@@ -20,7 +20,7 @@ public class GinfoHandler  extends AbstractHandler{
 		try {
 			exobj.put("status", status);
 			exobj.put("message", message);
-			exobj.put("questions", question);
+			exobj.put("query", question);
 			if(qlog!=null&&qlog.rankedSparqls!=null&&qlog.rankedSparqls.size()>0){
 				exobj.put("sparql", qlog.rankedSparqls.get(0).toStringForGStore2());
 			}

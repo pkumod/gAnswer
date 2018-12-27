@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GanswerHttpConnector {
-	public static final String defaultServerIP = "59.108.48.19";
+	public static final String defaultServerIP = "127.0.0.1";
     public static final int defaultServerPort = 9999;
     
     private String serverIP;
@@ -99,7 +99,7 @@ public class GanswerHttpConnector {
     
     public static void main(String[] args){
     	GanswerHttpConnector ghc = new GanswerHttpConnector();
-    	String data = "{\"dictionary\":{\"id\":\"test\"},\"log\":\"1\",\"maxAnswerNum\":\"3\",\"needSparql\":\"2\",\"questions\":\"\"}";
+    	String data = "{\"maxAnswerNum\":\"3\",\"needSparql\":\"2\",\"questions\":\"Who is the wife of Barack Obama?\"}";
     	ghc.gInfo();
     	ghc.gSolve(data);
     }

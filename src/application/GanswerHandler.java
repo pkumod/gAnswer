@@ -22,7 +22,7 @@ public class GanswerHandler extends AbstractHandler{
 		try {
 			exobj.put("status", status);
 			exobj.put("message", message);
-			exobj.put("questions", question);
+			exobj.put("query", question);
 			if(qlog!=null&&qlog.rankedSparqls!=null&&qlog.rankedSparqls.size()>0){
 				exobj.put("sparql", qlog.rankedSparqls.get(0).toStringForGStore2());
 			}
@@ -68,7 +68,6 @@ public class GanswerHandler extends AbstractHandler{
 			//step2 construct response
 			JSONObject resobj = new JSONObject();
 			resobj.put("status", "200");
-			resobj.put("id","test");
 			resobj.put("query",jsonobj.getString("questions"));
 			JSONObject tmpobj = new JSONObject();
 			if(needAnswer > 0){
@@ -116,12 +115,12 @@ public class GanswerHandler extends AbstractHandler{
 						bindingobj = new JSONObject();
 						for(String var:qlog.sparql.variables){
 							JSONObject bidobj = new JSONObject();
-							if(qlog.match.answers[i][j].startsWith("\""))
-								bidobj.put("type", "literal");
-							else
-								bidobj.put("type", "uri");
 							String[] ansRiv = qlog.match.answers[i][j].split(":");
 							bidobj.put("value", ansRiv[ansRiv.length-1]);
+							if(ansRiv[ansRiv.length-1].startsWith("<"))
+								bidobj.put("type", "uri");
+							else
+								bidobj.put("type", "literal");
 							System.out.println(qlog.match.answers[i][j]);
 							j += 1;
 							bindingobj.put(var, bidobj);

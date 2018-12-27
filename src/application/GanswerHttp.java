@@ -31,7 +31,7 @@ public class GanswerHttp {
         server.start();
         server.dumpStdErr();
         Globals.init();
-        server.join();  
         System.out.println("Server ready!");
+        server.join();  
     }  
 }
