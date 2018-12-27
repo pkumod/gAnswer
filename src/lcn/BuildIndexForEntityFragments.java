@@ -3,7 +3,6 @@ package lcn;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-//import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
 
@@ -15,20 +14,7 @@ import org.apache.lucene.index.IndexWriter;
 
 import qa.Globals;
 
-//import qa.Globals;
 
-/**
- * Lucene建立索引的基本单元是document，同时其中的域filed可以根据需要自己添加
- * 
- * Document是一个记录，用来表示一个条目，相当于数据库中的一行记录，就是搜索建立的倒排索引的条目。
- * eg:你要搜索自己电脑上的文件，这个时候就可以创建field(字段,相关于数据库中的列。 然后用field组合成document，最后会变成若干文件。
- * 这个document和文件系统document不是一个概念。
- * 
- * StandardAnalyzer是lucene中内置的"标准分析器",可以做如下功能: 
- * 1、对原有句子按照空格进行了分词
- * 2、所有的大写字母都可以能转换为小写的字母 
- * 3、可以去掉一些没有用处的单词，例如"is","the","are"等单词，也删除了所有的标点
- */
 public class BuildIndexForEntityFragments{
 	public void indexforentity() throws Exception
 	{

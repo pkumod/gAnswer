@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import qa.Globals;
 import nlp.ds.Word;
 
 public class SemanticQueryGraph implements Comparable<SemanticQueryGraph>

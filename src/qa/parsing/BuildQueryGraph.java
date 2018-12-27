@@ -1,11 +1,9 @@
 package qa.parsing;
 
-//import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 import java.util.Queue;
 
 import fgmt.EntityFragment;
@@ -17,16 +15,15 @@ import qa.Globals;
 import qa.extract.*;
 import qa.mapping.SemanticItemMapping;
 import rdf.PredicateMapping;
-import rdf.SemanticQueryGraph;
 import rdf.Triple;
 import rdf.SemanticRelation;
 import rdf.SimpleRelation;
 import rdf.SemanticUnit;
-//import paradict.ParaphraseDictionary;
 
-/*
- * The core class to build query graph, i.e, to generate SPARQL queries.
- * */
+/**
+ * Core class to build query graph, i.e, to generate SPARQL queries.
+ * @author husen
+ */
 public class BuildQueryGraph 
 {
 	public ArrayList<SemanticUnit> semanticUnitList = new ArrayList<SemanticUnit>();
@@ -48,7 +45,8 @@ public class BuildQueryGraph
 		whList.add("how");
 		whList.add("where");
 		
-		// Bad words for NODE. (base form)
+		// Bad words for NODE. (base form) 
+		// We will train a node recognition model to replace such heuristic rules further.
 		stopNodeList.add("list");
 		stopNodeList.add("give");
 		stopNodeList.add("show");
@@ -92,7 +90,7 @@ public class BuildQueryGraph
 		{
 			stopNodeList.add("area");
 		}
-		//how much is the total population of  european union?
+		//how much is the total population of european union?
 		if(qStr.contains("how much"))
 		{
 			stopNodeList.add("population");
@@ -202,7 +200,7 @@ public class BuildQueryGraph
 						continue;
 				}					
 				
-				//Notice, the following codes guarantee all possible edges (allow CIRCLE).
+				//Notice, the following code guarantee all possible edges (allow CIRCLE).
 				//Otherwise, NO CIRCLE, and the structure may be different by changing target.
 				if(Globals.evaluationMethod > 1)
 				{
@@ -273,209 +271,6 @@ public class BuildQueryGraph
 				
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
-		}
-	
-		return semanticUnitList;
-	}
-	
-	/*
-	 * For experiment.
-	 */
-	public ArrayList<SemanticUnit> getNodeList(QueryLogger qlog, DependencyTree ds)
-	{
-		semanticUnitList = new ArrayList<SemanticUnit>();
-						
-		// For ComplexQuestions or WebQuestions, only consider wh-word and at most two entities.
-		if(Globals.runningBenchmark.equals("CQ") || Globals.runningBenchmark.equals("WQ"))
-		{
-//			DependencyTreeNode target = ds.nodesList.get(0);
-//			if(Globals.runningBenchmark.equals("CQ"))
-//				target = detectTargetForCQ(ds, qlog);
-//			qlog.target = target.word;
-//			qlog.SQGlog += "++++ Target detect: "+target+"\n";
-//			
-//			detectTopicConstraint(qlog); 
-//			semanticUnitList.add(new SemanticUnit(qlog.target, false)); //Set variable to object 
-//			if(topicEnt != null)
-//			{
-//				semanticUnitList.add(new SemanticUnit(topicEnt, true)); //Set entity to subject
-//			}
-//			if(constraintEnt != null)
-//			{
-//				semanticUnitList.add(new SemanticUnit(constraintEnt, true)); //Set entity to subject
-//			}
-		}
-		// For general cases (e.g, QALD), consider internal variables.
-		else
-		{
-			for(DependencyTreeNode dtn: ds.nodesList)
-			{
-				if(isNodeWoCorefRe(dtn))	// ! Omit the coreference resolution rules !
-				{
-					semanticUnitList.add(new SemanticUnit(dtn.word, true)); //No prefer subject (default is true)
-				}
-			}
-		}
-		return semanticUnitList;
-	}
-	
-	/*
-	 * (For Experiment) Build query graph using STATE TRANSITION method based on 4 operations (with 4 conditions).
-	 * 1. Condition for Connect operation: do and must do | no other nodes on simple path in DS tree.
-	 * 2. Condition for Merge operation: do and must do | heuristic rules of CoReference Resolution.
-	 * 3. Condition for Fold operation: do or not do | no matches of low confidence of an edge.
-	 * 4. Condition for Expand operation: do and must do | has corresponding information.
-	 * */
-	public ArrayList<SemanticUnit> processEXP(QueryLogger qlog)
-	{
-		//0) Fix stop words
-		DependencyTree ds = qlog.s.dependencyTreeStanford;
-		if(qlog.isMaltParserUsed)
-			ds = qlog.s.dependencyTreeMalt;
-		fixStopWord(qlog, ds);
-		
-		//1) Detect Modifier/Modified
-		//rely on sentence (rather than dependency tree)
-		//with some ADJUSTMENT (eg, ent+noun(noType&&noEnt) -> noun.omitNode=TRUE)
-		for(Word word: qlog.s.words)
-			getTheModifiedWordBySentence(qlog.s, word);	//Find continuous modifier
-		for(Word word: qlog.s.words)
-			getDiscreteModifiedWordBySentence(qlog.s, word); //Find discrete modifier
-		for(Word word: qlog.s.words)
-			if(word.modifiedWord == null)	//Other words modify themselves. NOTICE: only can be called after detecting all modifier.
-				word.modifiedWord = word;
-		
-		//print log
-		for(Word word: qlog.s.words) 
-		{
-			if(word.modifiedWord != null && word.modifiedWord != word)
-			{
-				modifierList.add(word);
-				qlog.SQGlog += "++++ Modify detect: "+word+" --> " + word.modifiedWord + "\n";
-			}
-		}
-		
-		//2) Detect target & 3) Coreference resolution 
-		DependencyTreeNode target = detectTarget(ds,qlog); 
-		qlog.SQGlog += "++++ Target detect: "+target+"\n";
-		
-		if(target == null)
-			return null;
-		
-		qlog.target = target.word;
-		// !target can NOT be entity. (except general question)| which [city] has most people?
-		if(qlog.s.sentenceType != SentenceType.GeneralQuestion && target.word.emList!=null) 
-		{
-			//Counter example：Give me all Seven_Wonders_of_the_Ancient_World | (in fact, it not ENT, but CATEGORY, ?x subject Seve...)
-			target.word.mayEnt = false;
-			target.word.emList.clear();
-		}
-		
-		try 
-		{	
-			// step1: get node list
-			semanticUnitList = getNodeList(qlog, ds);
-			if(semanticUnitList == null || semanticUnitList.isEmpty())
-			{
-				qlog.SQGlog += "ERROR: no nodes found.";
-				return null;
-			}
-			
-			// step2: extract all potential relations
-			long t = System.currentTimeMillis();
-			System.out.println("Potential Relation Extraction start ...");
-			extractPotentialSemanticRelations(semanticUnitList, qlog);
-			qlog.timeTable.put("BQG_relation", (int)(System.currentTimeMillis()-t));
-				
-			// setp3: build query graph structure by 4 operations
-			t = System.currentTimeMillis();
-			SemanticQueryGraph bestSQG = null;
-			if(Globals.usingOperationCondition)
-			{
-				//TODO: use operation condition
-			}
-			else
-			{
-				// for experiment, do not use conditions.
-				PriorityQueue<SemanticQueryGraph> QGs = new PriorityQueue<SemanticQueryGraph>();
-				HashSet<SemanticQueryGraph> visited = new HashSet<>();
-				//Initial state: all nodes isolated.
-				SemanticQueryGraph head = new SemanticQueryGraph(semanticUnitList);
-				QGs.add(head);
-				
-				while(!QGs.isEmpty())
-				{
-					head = QGs.poll();
-					visited.add(head);
-					
-					//Judge: is it a final state?
-					if(head.isFinalState())
-					{
-						bestSQG = head;
-						break;	// now we just find the top-1 SQG
-					}
-					
-					//SQG generation
-					//Connect (enumerate)
-					for(SemanticUnit u: head.semanticUnitList)
-						for(SemanticUnit v: head.semanticUnitList)
-							if(!u.equals(v) && !u.neighborUnitList.contains(v) && !v.neighborUnitList.contains(u))
-							{
-								SemanticQueryGraph tail = new SemanticQueryGraph(head);
-								tail.connect(u, v);
-								if(!QGs.contains(tail) && !visited.contains(tail))
-								{
-									tail.calculateScore(qlog.potentialSemanticRelations);
-									QGs.add(tail);
-								}
-							}
-					
-					//Merge (coref resolution)
-					if(head.semanticUnitList.size() > 2)
-						for(SemanticUnit u: head.semanticUnitList)
-							for(SemanticUnit v: head.semanticUnitList)
-								if(!u.equals(v) && (!u.neighborUnitList.contains(v) && !v.neighborUnitList.contains(u)) || (u.neighborUnitList.contains(v) && v.neighborUnitList.contains(u)))
-								{
-									SemanticQueryGraph tail = new SemanticQueryGraph(head);
-									tail.merge(u, v);
-									if(!QGs.contains(tail) && !visited.contains(tail))
-									{
-										tail.calculateScore(qlog.potentialSemanticRelations);
-										QGs.add(tail);
-									}
-								}
-				}
-			}
-			qlog.timeTable.put("BQG_structure", (int)(System.currentTimeMillis()-t));
-			
-			//Relation Extraction by potentialSR
-			qlog.semanticUnitList = new ArrayList<SemanticUnit>();
-			qlog.semanticRelations = bestSQG.semanticRelations;
-			semanticUnitList = bestSQG.semanticUnitList;
-			matchRelation(semanticUnitList, qlog);
-			
-			//Prepare for item mapping
-			TypeRecognition.AddTypesOfWhwords(qlog.semanticRelations); // Type supplementary
-			TypeRecognition.constantVariableRecognition(qlog.semanticRelations, qlog); // Constant or Variable, embedded triples
-			
-			//(just for display)
-			recordOriginalTriples(semanticUnitList, qlog);
-				
-			//step3: item mapping & top-k join
-			t = System.currentTimeMillis();
-			SemanticItemMapping step5 = new SemanticItemMapping();
-			step5.process(qlog, qlog.semanticRelations);	//top-k join (generate SPARQL queries), disambiguation
-			qlog.timeTable.put("BQG_topkjoin", (int)(System.currentTimeMillis()-t));
-			
-			//step6: implicit relation [modify word]
-			t = System.currentTimeMillis();
-			ExtractImplicitRelation step6 = new ExtractImplicitRelation();
-			step6.supplementTriplesByModifyWord(qlog);
-			qlog.timeTable.put("BQG_implicit", (int)(System.currentTimeMillis()-t));		
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	
@@ -752,35 +547,6 @@ public class BuildQueryGraph
 			return false;
 		
 		if(cur.word.omitNode || cur.word.represent!=null)
-			return false;
-		
-		// Modifier can NOT be node (They may be added in query graph in the end) e.g., Queen Elizabeth II，Queen(modifier)
-		if(modifierList.contains(cur.word))
-			return false;
-		
-		// NOUN
-		if(cur.word.posTag.startsWith("N"))
-			return true;
-
-		// Wh-word
-		if(whList.contains(cur.word.baseForm))
-			return true;
-		
-		if(cur.word.mayEnt || cur.word.mayType || cur.word.mayCategory)
-			return true;
-		return false;
-	}
-	
-	/*
-	 * Judge nodes strictly.
-	 * For EXP, do not use COREF resolution rules.
-	 * */
-	public boolean isNodeWoCorefRe(DependencyTreeNode cur)
-	{
-		if(stopNodeList.contains(cur.word.baseForm))
-			return false;
-		
-		if(cur.word.omitNode)
 			return false;
 		
 		// Modifier can NOT be node (They may be added in query graph in the end) e.g., Queen Elizabeth II，Queen(modifier)

@@ -28,7 +28,6 @@ public class Globals {
 	public static DBpediaLookup dblk;
 	public static int MaxAnswerNum = 100;
 	public static String Dataset = "dbpedia 2016";
-	public static String DictionaryPath = "default";
 	public static String Version = "0.1.2";
 	public static String GDBsystem = "gStore v0.7.2";
 	
@@ -38,24 +37,14 @@ public class Globals {
 	 * 2. super SQG, allow CIRCLE and WRONG edge. The structure is decided by DS tree, and can be changed in query evaluation(TOP-K match) stage. 
 	 * */
 	public static int evaluationMethod = 2; 
-	public static boolean isRunAsWebServer = false;	// Run Local: false; Run Server: true
-	public static String runningBenchmark = "QALD";	// WQ:WebQuestions; WQSP:WebQuestionsSP; CQ:ComplexQuestions
-													// using different method and Freebase Version (in Virtuoso.java)
-	public static boolean usingOperationCondition = false; // only for EXP: try state transition operations only when condition are satisfied.
-
 	
-	public static String localPath = "/media/wip/husen/NBgAnswer/";
-	public static String QueryEngineIP = "127.0.0.1";	// Notice, PORT number is in the evaluation function.
+	public static String localPath = "./././";
+	public static String QueryEngineIP = "172.31.222.90";	// Notice, PORT number is in the evaluation function.
+	public static int QueryEnginePort = 9001;
 	
 	public static void init () 
 	{
 		System.out.println("====== gAnswer2.0 over DBpedia ======");
-		
-		if(isRunAsWebServer == false)
-		{
-			localPath = "D:/husen/gAnswer/";
-			QueryEngineIP = "172.31.222.72";
-		}
 
 		long t1, t2, t3, t4, t5, t6, t7, t8, t9;
 		

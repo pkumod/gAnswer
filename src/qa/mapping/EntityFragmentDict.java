@@ -2,8 +2,6 @@ package qa.mapping;
 
 import java.util.HashMap;
 
-//import lcn.EntityFragmentFields;
-//import qa.Globals;
 import fgmt.EntityFragment;
 
 public class EntityFragmentDict {

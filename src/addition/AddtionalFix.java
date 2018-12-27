@@ -5,19 +5,13 @@ import java.util.HashMap;
 
 import paradict.PredicateIDAndSupport;
 import log.QueryLogger;
-//import nlp.ds.DependencyTree;
-//import nlp.ds.DependencyTreeNode;
 import nlp.ds.Word;
 import nlp.ds.Sentence.SentenceType;
 import qa.Globals;
-//import qa.extract.TypeRecognition;
-//import qa.mapping.SemanticItemMapping;
-//import rdf.EntityMapping;
 import rdf.SemanticUnit;
 import rdf.Sparql;
 import rdf.Sparql.QueryType;
 import rdf.Triple;
-//import fgmt.TypeFragment;
 
 
 public class AddtionalFix 

@@ -37,7 +37,6 @@ public class GinfoHandler  extends AbstractHandler{
 	        JSONObject infoobj = new JSONObject();
 	        
 			infoobj.put("version", Globals.Version);
-			infoobj.put("dictionary", Globals.DictionaryPath);
 		    infoobj.put("dataset", Globals.Dataset);
 		    infoobj.put("GDB system", Globals.GDBsystem);
 

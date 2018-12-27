@@ -2,9 +2,7 @@ package jgsc;
 
 import java.io.*;
 import java.net.*;
-import java.lang.*;
 import java.net.URLEncoder;
-import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
@@ -53,39 +51,25 @@ public class GstoreConnector {
             String urlNameString = url + "/" + param;
             System.out.println("request: "+urlNameString);
             URL realUrl = new URL(urlNameString);
-            // 閹垫挸绱戦崪瀛禦L娑斿妫块惃鍕箾閹猴拷
             URLConnection connection = realUrl.openConnection();
-            // 鐠佸墽鐤嗛柅姘辨暏閻ㄥ嫯顕Ч鍌氱潣閹拷
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
 			//set agent to avoid: speed limited by server if server think the client not a browser
             connection.setRequestProperty("user-agent",
                     "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-            // 瀵よ櫣鐝涚�圭偤妾惃鍕箾閹猴拷
             connection.connect();
 
 			long t0 = System.currentTimeMillis(); //ms
 
-            // 閼惧嘲褰囬幍锟介張澶婃惙鎼存柨銇旂�涙顔�
             Map<String, List<String>> map = connection.getHeaderFields();
-            // 闁秴宸婚幍锟介張澶屾畱閸濆秴绨叉径鏉戠摟濞堬拷
-            //for (String key : map.keySet()) {
-            //    System.out.println(key + "--->" + map.get(key));
-            //}
 
 			long t1 = System.currentTimeMillis(); //ms
-			//System.out.println("Time to get header: "+(t1 - t0)+" ms");
-			//System.out.println("============================================");
-
-            // 鐎规矮绠� BufferedReader鏉堟挸鍙嗗ù浣规降鐠囪褰嘦RL閻ㄥ嫬鎼锋惔锟�
             in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
             String line;
             while ((line = in.readLine()) != null) {
 				//PERFORMANCE: this can be very costly if result is very large, because many temporary Strings are produced
 				//In this case, just print the line directly will be much faster
 				result.append(line+"\n");
-				//System.out.println("get data size: " + line.length());
-				//System.out.println(line);
             }
 
 			long t2 = System.currentTimeMillis(); //ms
@@ -94,7 +78,6 @@ public class GstoreConnector {
             System.out.println("error in get request: " + e);
             e.printStackTrace();
         }
-        // 娴ｈ法鏁inally閸ф娼甸崗鎶芥４鏉堟挸鍙嗗ù锟�
         finally {
             try {
                 if (in != null) {
@@ -132,29 +115,20 @@ public class GstoreConnector {
             String urlNameString = url + "/" + param;
             System.out.println("request: "+urlNameString);
             URL realUrl = new URL(urlNameString);
-            // 閹垫挸绱戦崪瀛禦L娑斿妫块惃鍕箾閹猴拷
             URLConnection connection = realUrl.openConnection();
-            // 鐠佸墽鐤嗛柅姘辨暏閻ㄥ嫯顕Ч鍌氱潣閹拷
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
             //set agent to avoid: speed limited by server if server think the client not a browser
             connection.setRequestProperty("user-agent","Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-            // 瀵よ櫣鐝涚�圭偤妾惃鍕箾閹猴拷
             connection.connect();
             
             long t0 = System.currentTimeMillis(); //ms
             
-            // 閼惧嘲褰囬幍锟介張澶婃惙鎼存柨銇旂�涙顔�
             Map<String, List<String>> map = connection.getHeaderFields();
-            // 闁秴宸婚幍锟介張澶屾畱閸濆秴绨叉径鏉戠摟濞堬拷
-            //for (String key : map.keySet()) {
-            //   System.out.println(key + "--->" + map.get(key));
-            //}
 
             long t1 = System.currentTimeMillis(); // ms
             //System.out.println("Time to get header: "+(t1 - t0)+" ms");
 
-            // 鐎规矮绠� BufferedReader鏉堟挸鍙嗗ù浣规降鐠囪褰嘦RL閻ㄥ嫬鎼锋惔锟�
             in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
             char chars[] = new char[2048];
             int b;
@@ -170,7 +144,6 @@ public class GstoreConnector {
             //System.out.println("error in get request: " + e);
             e.printStackTrace();
         }
-        // 娴ｈ法鏁inally閸ф娼甸崗鎶芥４鏉堟挸鍙嗗ù锟�
         finally {
             try {
                 if (in != null) {
@@ -477,13 +450,6 @@ public class GstoreConnector {
         //System.out.println(flag);
         String answer = gc.query("root", "123456", "dbpedia16", sparql);
         System.out.println(answer);
-
-		//To count the time cost
-		//long startTime=System.nanoTime();   //ns
-		//long startTime=System.currentTimeMillis();   //ms
-		//doSomeThing();  //濞村鐦惃鍕敩閻焦顔�
-		//long endTime=System.currentTimeMillis(); //閼惧嘲褰囩紒鎾存将閺冨爼妫�
-		//System.out.println("缁嬪绨潻鎰攽閺冨爼妫块敍锟� "+(end-start)+"ms");
     }
 }
 

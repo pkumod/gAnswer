@@ -19,8 +19,7 @@ import rdf.EntityMapping;
 public class DBpediaLookup {
 	//There are two websites of the DBpediaLookup online service.
 	//public static final String baseURL = "http://en.wikipedia.org/w/api.php?action=opensearch&format=xml&limit=10&search=";
-	//public static final String baseURL = "http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?MaxHits=5&QueryString=";
-	public static final String baseURL = "http://172.31.222.72:1234/api/search/KeywordSearch?MaxHits=5&QueryString=";
+	public static final String baseURL = "http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?MaxHits=5&QueryString=";
 	
 	public HttpClient ctripHttpClient = null;
 	

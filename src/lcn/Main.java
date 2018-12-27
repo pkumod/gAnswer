@@ -1,11 +1,8 @@
 package lcn;
 
-//import java.io.IOException;
-//import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import fgmt.EntityFragment;
 import qa.Globals;
 import qa.mapping.EntityFragmentDict;
 

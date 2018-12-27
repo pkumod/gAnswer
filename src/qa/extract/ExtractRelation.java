@@ -10,7 +10,6 @@ import java.util.Queue;
 import log.QueryLogger;
 import nlp.ds.DependencyTree;
 import nlp.ds.DependencyTreeNode;
-//import nlp.ds.Word;
 import paradict.ParaphraseDictionary;
 import qa.Globals;
 import rdf.SimpleRelation;

@@ -1,7 +1,6 @@
 package qa.extract;
 
 import java.io.BufferedReader;
-//import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +25,6 @@ public class ExtractImplicitRelation {
 	
 	static final int SamplingNumber = 100;	// the maximum sampling number in calculation
 	static final int k = 3;	// select top-k when many suitable relations; select top-k entities for a word
-	public HashMap<String, Integer> implicitEntRel = new HashMap<String, Integer>();
 	
 	/*
 	 * Implicit Relations:
@@ -39,9 +37,6 @@ public class ExtractImplicitRelation {
 	 * */
 	public ExtractImplicitRelation()
 	{
-		//orignal word to lower case
-		implicitEntRel.put("american", Globals.pd.predicate_2_id.get("country"));
-		implicitEntRel.put("united_states", Globals.pd.predicate_2_id.get("country"));
 	}
 	
 	// Notice, it is usually UNNECESSARY for two constant, so we unimplemented this function. 
@@ -95,14 +90,6 @@ public class ExtractImplicitRelation {
 						int eId = word.emList.get(i).entityID;
 						String eName = word.emList.get(i).entityName;
 						irList = getPrefferdPidListBetween_Entity_TypeVariable(eId, tId);
-						
-						// !Handwriting implicit relations
-						if(irList != null && implicitEntRel.containsKey(word.originalForm.toLowerCase()))
-						{
-							int pId = implicitEntRel.get(word.originalForm.toLowerCase());
-							ImplicitRelation ir = new ImplicitRelation(tId, eId, pId, 1000);
-							irList.add(0, ir);
-						}
 						
 						if(irList!=null && irList.size()>0)
 						{

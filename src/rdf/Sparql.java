@@ -2,13 +2,9 @@ package rdf;
 
 import java.util.ArrayList;
 import java.util.Collections;
-//import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import log.QueryLogger;
-import nlp.ds.Sentence;
-import nlp.ds.Sentence.SentenceType;
 import qa.Globals;
 
 public class Sparql implements Comparable<Sparql> 
@@ -137,84 +133,26 @@ public class Sparql implements Comparable<Sparql>
 		}					
 		
 		// part2: triples
-		ret += " where\n{\n";
+		ret += " where { ";
 		for(Triple t : tripleList) 
 		{
 			if (!t.object.equals("literal_HRZ")) {	// need not display literal
 				ret += t.toStringForGStore();
-				ret += " .\n";
+				ret += ". ";
 			}
 		}
-		ret += "}\n";
+		ret += "} ";
 		
 		// part3: order by / group by ...
 		if(moreThanStr != null)
-			ret += moreThanStr+"\n";
+			ret += moreThanStr+" ";
 		if(mostStr != null)
-			ret += mostStr+"\n";
+			ret += mostStr+" ";
 		
 		// part4: limit
 		if(queryType != QueryType.Ask && (mostStr == null || !mostStr.contains("LIMIT")))
 			ret += "LIMIT " + Globals.MaxAnswerNum; 
 		
-		return ret;
-	}
-	
-	//Use to execute (select all variables; format 'aggregation' and 'ask')
-	public String toStringForVirtuoso()
-	{
-		String ret = "";
-		HashSet<String> variables = new HashSet<String>();
-		
-		// prefix
-		if (queryType==QueryType.Ask)
-			ret += "ask where";
-		else if(countTarget)
-			ret += ("select COUNT(DISTINCT " + questionFocus + ") where");
-		else
-		{
-			// AGG: select question focus
-			if(moreThanStr != null || mostStr != null)
-				ret += ("select DISTINCT " + questionFocus + " where");
-			// BGP: select all variables
-			else
-			{
-				for (Triple t: tripleList)
-				{
-					if (!t.isSubjConstant()) variables.add(t.subject.replaceAll(" ", "_"));
-					if (!t.isObjConstant()) variables.add(t.object.replaceAll(" ", "_"));		
-				}
-				
-				ret += "select ";
-				for (String v : variables)
-					ret += v + " ";
-				ret += "where";
-			}
-		}					
-		ret += "\n{\n";
-		if(variables.size() == 0)
-			variables.add(questionFocus);
-		
-		// triples
-		for (Triple t : tripleList) 
-		{
-			if (!t.object.equals("literal_HRZ")) {
-				ret += t.toStringForGStore();
-				ret += " .\n";
-			}
-		}
-		ret += "}\n";
-		
-		// suffix
-		if(moreThanStr != null)
-		{
-			ret += moreThanStr+"\n";
-		}
-		if(mostStr != null)
-		{
-			ret += mostStr+"\n";
-		}
-	
 		return ret;
 	}
 		
@@ -258,7 +196,6 @@ public class Sparql implements Comparable<Sparql>
 	public boolean equals(Object spq) 
 	{ 
 	    Sparql tempSparql= (Sparql) spq; 
-	    String s1 = this.toStringForGStore2(), s2 = tempSparql.toStringForGStore2();
 	    if(this.toStringForGStore2().equals(tempSparql.toStringForGStore2()))
 	    	return true; 
 	    else 

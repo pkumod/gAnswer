@@ -1,7 +1,5 @@
 package qa.parsing;
 
-import org.maltparser.core.exception.MaltChainedException;
-
 import log.QueryLogger;
 import nlp.ds.DependencyTree;
 import nlp.ds.DependencyTreeNode;

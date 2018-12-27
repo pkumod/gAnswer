@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 import nlp.ds.Word;
 import nlp.tool.StopWordsList;
-//import fgmt.RelationFragment;
 import fgmt.TypeFragment;
 import lcn.SearchInTypeShortName;
 import log.QueryLogger;
@@ -44,7 +43,6 @@ public class TypeRecognition {
 	{
 		extendTypeMap = new HashMap<String, String>();
 		extendVariableMap = new HashMap<String, Triple>();
-		Triple triple = null;
 		
 		//!Handwriting for convenience | TODO: approximate/semantic match of type
 		extendTypeMap.put("NonprofitOrganizations", "dbo:Non-ProfitOrganisation");
@@ -55,19 +53,6 @@ public class TypeRecognition {
 		extendTypeMap.put("USStates", "yago:StatesOfTheUnitedStates");
 		extendTypeMap.put("Europe", "yago:EuropeanCountries");
 		extendTypeMap.put("Africa", "yago:AfricanCountries");
-		
-		//!The following IDs are based on DBpedia 2014.
-		//!extend variable (embedded triples) | eg, [?E|surfers]-?uri dbo:occupation res:Surfing | canadians��<?canadian>	<birthPlace>	<Canada>
-		//1) <?canadians>	<birthPlace>	<Canada> | [country people] <birthPlace|1639> [country]
-		triple = new Triple(Triple.VAR_ROLE_ID, Triple.VAR_NAME, 1639, 2112902, "Canada", null, 100);
-		extendVariableMap.put("canadian", triple);
-		triple = new Triple(Triple.VAR_ROLE_ID, Triple.VAR_NAME, 1639, 883747, "Germany", null, 100);
-		extendVariableMap.put("german", triple);
-		//2) ?bandleader <occupation|6690> <Bandleader>
-		triple = new Triple(Triple.VAR_ROLE_ID, Triple.VAR_NAME, 6690, 5436853, "Bandleader", null, 100);
-		extendVariableMap.put("bandleader", triple);
-		triple = new Triple(Triple.VAR_ROLE_ID, Triple.VAR_NAME, 6690, 5436854, "Surfing>", null, 100);
-		extendVariableMap.put("surfer", triple);
 	}
 	
 	public static void recognizeExtendVariable(Word w)

@@ -254,17 +254,6 @@ public class EntityFragment extends Fragment {
 				}
 			}
 		}
-		
-		//TODO: fix data for DBpedia 2014 (should be eliminated when update dataset)
-		if(eid==2640237) //Barack_Obama
-		{
-			inEdges.add(8432); //spouse
-			outEdges.add(8432);
-			ArrayList<Integer> outEdgeList = new ArrayList<Integer>();
-			outEdgeList.add(8432);
-			inEntMap.put(4953443, outEdgeList);
-			outEntMap.put(4953443, outEdgeList);
-		}
 	}
 	
 	@Override

@@ -1,10 +1,7 @@
 package qa;
 
-import java.io.*;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import jgsc.GstoreConnector;
@@ -73,7 +70,6 @@ public class GAnswer {
 				t = System.currentTimeMillis();
 				BuildQueryGraph step2 = new BuildQueryGraph();
 				step2.process(qlog);
-//				step2.processEXP(qlog);
 				qlog.timeTable.put("step2", (int)(System.currentTimeMillis()-t));
 				
 				// step 3: some fix (such as "one-node" or "ask-one-triple") and aggregation
@@ -156,97 +152,10 @@ public class GAnswer {
 		return spq;
 	}
 	
-
-	
-	/**
-	 * Get answers from Virtuoso + DBpedia, this function require OLD version Virtuoso + Virtuoso Handler.
-	 * Virtuoso can solve "Aggregation"
-	 **/
-//	public Matches getAnswerFromVirtuoso (QueryLogger qlog, Sparql spq)
-//	{
-//		Matches ret = new Matches();
-//		try 
-//		{
-//			Socket socket = new Socket(Globals.QueryEngineIP, 1112);
-//			DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-//			
-//			//formatting SPARQL & evaluate
-//			String formatedSpq = spq.toStringForVirtuoso();
-//			dos.writeUTF(formatedSpq);
-//			dos.flush();
-//			System.out.println("STD SPARQL:\n"+formatedSpq+"\n");
-//			
-//			ArrayList<String> rawLines = new ArrayList<String>();
-//			DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));			
-//			while (true)
-//			{
-//				String line = dis.readUTF();
-//				if (line.equals("[[finish]]"))	break;
-//				rawLines.add(line);
-//			}
-//			
-//			// ASK query was translated to SELECT query, whose answer need translation.
-//			// It is no need to translate, use "ASK WHERE" directly ! 2018-12-11
-//			if(qlog.s.sentenceType == SentenceType.GeneralQuestion)
-//			{
-//				ret.answersNum = 1;
-//				ret.answers = new String[1][1];
-//				if(rawLines.size() == 0)
-//				{
-//					ret.answers[0][0] = "general:false";
-//				}
-//				else
-//				{
-//					ret.answers[0][0] = "general:true";
-//				}
-//				System.out.println("general question answer:" + ret.answers[0][0]);
-//				dos.close();
-//				dis.close();
-//				socket.close();
-//				return ret;
-//			}
-//			
-//			//select but no results
-//			if (rawLines.size() == 0)
-//			{
-//				ret.answersNum = 0;
-//				dos.close();
-//				dis.close();
-//				socket.close();
-//				return ret;
-//			}
-//			
-//			int ansNum = rawLines.size();
-//			int varNum = variables.size();
-//			ArrayList<String> valist = new ArrayList<String>(variables);
-//			ret.answers = new String[ansNum][varNum];
-//			
-//			System.out.println("ansNum=" + ansNum);
-//			System.out.println("varNum=" + varNum);
-//			for (int i=0;i<rawLines.size();i++)
-//			{
-//				String[] ansLineContents = rawLines.get(i).split("\t");
-//				for (int j=0;j<varNum;j++)
-//				{
-//					ret.answers[i][j] = valist.get(j) + ":" + ansLineContents[j];
-//				}
-//			}
-//			
-//			dos.close();
-//			dis.close();
-//			socket.close();		
-//		} 
-//		catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return ret;
-//	}
-	
 	public Matches getAnswerFromGStore2 (Sparql spq)
 	{
 		// modified by Lin Yinnian using ghttp - 2018-9-28
-		GstoreConnector gc = new GstoreConnector("172.31.222.90", 9001);
+		GstoreConnector gc = new GstoreConnector(Globals.QueryEngineIP, Globals.QueryEnginePort);
         String answer = gc.query("root", "123456", "dbpedia16", spq.toStringForGStore2());
         System.out.println(answer);
 		String[] rawLines = answer.split("\n");
@@ -338,14 +247,11 @@ public class GAnswer {
 //				// Execute by Virtuoso or GStore when answers not found
 				if(m == null || m.answers == null)
 				{
-					if (curSpq.tripleList.size()>0 && curSpq.questionFocus!=null)
+					if(curSpq.tripleList.size()>0 && curSpq.questionFocus!=null)
 					{
-//						if(ga.isBGP(qlog, curSpq))
-                            m = ga.getAnswerFromGStore2(curSpq);
-//                        else
-//                            m = ga.getAnswerFromVirtuoso(qlog, curSpq);
+						m = ga.getAnswerFromGStore2(curSpq);
 					}
-					if (m != null && m.answers != null) 
+					if(m != null && m.answers != null) 
                     {
                         // Found results using current SPQ, then we can break and print result.
                         qlog.sparql = curSpq;

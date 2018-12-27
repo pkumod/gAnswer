@@ -65,7 +65,7 @@ public class SimpleRelation {
 			}
 			sumSelectivity = matchingScore*sumSelectivity*pidsup.support;			
 			int pid = pidsup.predicateID;
-			if (Globals.pd.dbo_predicate_id.contains(pid)) sumSelectivity *= 1.5; //����dbo�е�predicate //pid ���ܲ��� dbo �У�
+			if (Globals.pd.dbo_predicate_id.contains(pid)) sumSelectivity *= 1.5; 
 			
 			if (!pasList.containsKey(pid))
 				pasList.put(pid, sumSelectivity);

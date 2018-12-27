@@ -4,7 +4,6 @@ import nlp.ds.DependencyTree;
 import nlp.ds.DependencyTreeNode;
 import nlp.ds.Word;
 import qa.Globals;
-import rdf.SemanticRelation;
 import rdf.Sparql;
 import rdf.Triple;
 import log.QueryLogger;
@@ -33,7 +32,6 @@ public class AggregationRecognition {
 			case 1:
 				return b;          		
 			case 2:	                     // Words need to be translated into numbers
-			   boolean flag1=true;
 			   for(i=0;i<8;i++)                // 20~99
 			    {
 			    	for(j=0;j<10;j++)

@@ -1,21 +1,14 @@
 package qa.extract;
 
 import java.io.BufferedReader;
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.FileNotFoundException;
-//import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-//import java.io.OutputStreamWriter;
-//import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import lcn.EntityFragmentFields;
 import fgmt.EntityFragment;
 import nlp.ds.Word;
 import qa.Globals;
@@ -38,7 +31,6 @@ public class EntityRecognition {
 	double TypeAcceptedScore = 0.5;
 	double AcceptedDiffScore = 1;
 	
-	public HashMap<String, String> m2e = null;
 	public ArrayList<MergedWord> mWordList = null;
 	public ArrayList<String> stopEntList = null;
 	public ArrayList<String> badTagListForEntAndType = null;
@@ -64,12 +56,6 @@ public class EntityRecognition {
 		badTagListForEntAndType.add("VBZ");
 		badTagListForEntAndType.add("VBP");
 		badTagListForEntAndType.add("POS");
-		
-		// !Handwriting entity linking; (lower case)
-		m2e = new HashMap<String, String>();
-		m2e.put("bipolar_syndrome", "Bipolar_disorder");
-		m2e.put("battle_in_1836_in_san_antonio", "Battle_of_San_Jacinto");
-		m2e.put("federal_minister_of_finance_in_germany", "Federal_Ministry_of_Finance_(Germany)");
 		
 		// Additional fix for CATEGORY (in DBpedia)
 		af = new AddtionalFix();
@@ -156,7 +142,7 @@ public class EntityRecognition {
 				
 				allCnt++;
 /*
- * Filters to save time and drop some bad cases.  
+ * Filters to speed up and drop some bad cases.  
 */				
 				boolean entOmit = false, typeOmit = false;
 				int prep_cnt=0;
@@ -446,8 +432,8 @@ public class EntityRecognition {
 						if(likelyEnt.equals(lowerOriginalWord))
 							score *= len;
 						// !Award: COVER (eg, Robert Kennedy: [Robert] [Kennedy] [Robert Kennedy])
-						//像Social_Democratic_Party，这三个word任意组合都是ent，导致方案太多；相比较“冲突选哪个”，“连or不应该连”显得更重要（而且实际错误多为连或不连的错误），所以这里直接抛弃被覆盖的小ent
-						//像Abraham_Lincoln，在“不连接”的方案中，会把他们识别成两个node，最后得分超过了正确答案的得分；故对于这种词设置为必选
+						//e.g, Social_Democratic_Party -> all ents -> drop the overlapped smaller ones
+						//e.g, Abraham_Lincoln -> select the whole word
 						if(len>1)
 						{
 							boolean[] flag = new boolean[words.length+1];
@@ -473,8 +459,6 @@ public class EntityRecognition {
 							// WHOLE match || HIGH match & HIGH upper || WHOLE upper
 							if(hitCnt == len || ((double)hitCnt/(double)len > 0.6 && (double)UpperWordCnt/(double)len > 0.6) || UpperWordCnt == len || len>=4)
 							{
-								//如中间有逗号，则要求两边的词都在mapping的entity中出现
-								//例如 Melbourne_,_Florida: Melbourne, Florida 是必须选的，而 California_,_USA: Malibu, California，认为不一定正确
 								boolean commaTotalRight = true;
 								if(originalWord.contains(","))
 								{
@@ -741,19 +725,10 @@ public class EntityRecognition {
 		String n = entity;
 		ArrayList<EntityMapping> ret= new ArrayList<EntityMapping>();
 		
-		//1. Handwriting 
-		if(m2e.containsKey(entity))
-		{
-			String eName = m2e.get(entity);
-			EntityMapping em = new EntityMapping(EntityFragmentFields.entityName2Id.get(eName), eName, 1000);
-			ret.add(em);
-			return ret; //handwriting is always correct
-		}
-		
-		//2. Lucene index
+		//1. Lucene index
 		ret.addAll(EntityFragment.getEntityMappingList(n));
 		
-		//3. DBpedia Lookup (some cases)
+		//2. DBpedia Lookup (some cases)
 		if (useDblk) 
 		{ 
 			ret.addAll(Globals.dblk.getEntityMappings(n, null));
@@ -880,36 +855,7 @@ public class EntityRecognition {
 				
 				er.process(question);
 			}
-			
-//			File inputFile = new File("D:\\husen\\gAnswer\\data\\test\\test_in.txt");
-//			File outputFile = new File("D:\\husen\\gAnswer\\data\\test\\test_out.txt");
-//			BufferedReader fr = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile),"utf-8"));
-//			OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(outputFile,true),"utf-8");
-//
-//			String input;
-//			while((input=fr.readLine())!=null)
-//			{
-//				String[] strArray = input.split("\t");
-//				String id = "";
-//				String question = strArray[0];
-//				if(strArray.length>1)
-//				{
-//					question = strArray[1];
-//					id = strArray[0];
-//				}
-//				//Notice "?" may leads lucene/dbpedia lookup error
-//				if(question.length()>1 && question.charAt(question.length()-1)=='.' || question.charAt(question.length()-1)=='?')
-//					question = question.substring(0,question.length()-1);
-//				if(question.isEmpty())
-//					continue;
-//				er.process(question);
-//				fw.write("Id: "+id+"\nQuery: "+question+"\n");
-//				fw.write(er.preLog+"\n");
-//			}
-//			
-//			fr.close();
-//			fw.close();
-			
+	
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
