@@ -10,10 +10,21 @@ GAnswer系统是由北京大学计算机技术研究所数据管理实验室邹�
 ### 使用jar包部署
 我们推荐您使用我们提供的打包好的jar文件部署gAnswer，具体步骤为：
 
-- 下载Ganswer.jar与data.rar两个文件，我们推荐您从github的release页面下载最新版的Ganswer.jar，以保证稳定性。
-- 在控制台下解压Ganswer.jar，您可以解压到任意文件路径下，但请保证Ganswer.jar文件与解压得到的文件处在统一路径下。
-- 在控制台下解压data.rar，这时，您需要把解压得到的文件夹置于Ganswer.jar文件所在的路径下。
-- 在控制台下输入java -jar Ganswer.jar，运行jar包，等待系统初始化结束，出现Server Ready！字样后，则说明初始化成功，您可以开始通过Http请求访问gAnswer的服务了。
+- 下载Ganswer.jar与dbpedia16.rar两个文件，我们推荐您从github的release页面下载最新版的Ganswer.jar，以保证稳定性。
+- 在控制台下解压Ganswer.jar
+```java
+jar -xvf Ganswer.jar
+```
+- 您应该解压到主工程目录下，请保证Ganswer.jar文件与解压得到的文件处在同一路径下。
+- 在控制台下解压dbpedia16.rar，注意，这时，您需要把解压得到的文件置于Ganswer.jar文件所在的路径的data文件夹下。下方的示例默认dbpedia16.rar与Ganswer.jar已经处于同一文件夹下。
+```java
+unrar x dbpedia16.rar ./data/
+```
+- 在控制台下运行jar包。
+```java
+java -jar Ganswer.jar
+```
+- 等待系统初始化结束，出现Server Ready！字样后，则说明初始化成功，您可以开始通过Http请求访问gAnswer的服务了。
 
 这部分信息可以在帮助文档的‘“2.1.1 开始使用”’一章找到。
 
@@ -21,7 +32,7 @@ GAnswer系统是由北京大学计算机技术研究所数据管理实验室邹�
 
 ### 使用eclipse运行
 当您使用eclipse运行gAnswer系统时，只需要通过clone或者download获取工程源码，然后按正常步骤导入Eclipse工程，同时将lib中的jar包加入Build Path中即可。
-这时，您同样需要下载解压data.rar,并解压到工程文件根目录下。与数据路径相关的参数，您可以在qa.Globals.localPath中找到
+这时，您同样需要下载解压dbpedia16.rar,并解压到工程文件根目录下的data文件夹中。与数据路径相关的参数，您可以在qa.Globals.localPath中找到
 
 ### 注意事项
 要运行gAnswer系统，需要较多的包依赖、文件依赖和外部接口依赖，关于这部分要求，请您参阅帮助文档的“2.4 安装指南”。
