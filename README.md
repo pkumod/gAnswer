@@ -2,7 +2,7 @@
 
 GAnswer系统是由北京大学计算机技术研究所数据管理实验室邹磊老师牵头开发的自然语言问答系统。gAnswer能够将自然语言问题转化成包含语义信息的查询图，然后，将查询图转化成标准的SPARQL查询，并将这些查询在图数据库中执行，最终得到用户的答案。我们使用数据驱动的消歧方式，具体来讲，在生成查询图的阶段保留多种实体和谓词的链接方案，在查询执行的阶段根据匹配情况消除歧义（错误链接）。
 
-这是TKDE 2018论文 [Answering Natural Language Questions by Subgraph Matching over Knowledge Graphs](docs/TKDE18_gAnswer.pdf)的代码实现。
+这是TKDE 2018论文 [Answering Natural Language Questions by Subgraph Matching over Knowledge Graphs](docs/TKDE18_gAnswer.pdf) 的代码实现。
 
 **帮助文档请点击此处 [中文(ZH)](docs/gAnswer_help.pdf)**
 
