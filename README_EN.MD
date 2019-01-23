@@ -43,10 +43,10 @@ If you would like to run GAnswer in Eclipse, you need to clone or download the s
 Due to the sizes, these jar files can not be uploaded to github. Therefore, you can download them [here](https://pan.baidu.com/s/1ZfdKDtuE6PLby1koEs6aFg). The extract code is ud2v.
 Meanwhile, dbpedia16.rar is also needed. Please unzipped it into directory named data under the project main directory. Parameters about data path can be found in qa.Globals.localPath.
 
-### Attention
+### Notice
 To run GAnswer, you have to deal with multiple dependencies involving jar, data files and external API. Related information is in Chapter 2.4 in the help document.
 
-## Addition
+## Other Business
 
 You are welcome to use GAnswer and tell us your valuable advice or bug report.
 
