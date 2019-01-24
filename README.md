@@ -22,13 +22,43 @@ jar -xvf Ganswer.jar
 ```java
 unrar x dbpedia16.rar ./data/
 ```
+- 这时，您现在的工程目录结构应该是这样的：
+>Main_project_directory
+>>Ganswer.jar<br />
+>>unzipped files from Ganswer.jar<br />
+>>data
+>>>unzipped files from dbpedia16.rar<br />
 - 在控制台下运行jar包。
 ```java
 java -jar Ganswer.jar
 ```
 - 等待系统初始化结束，出现Server Ready！字样后，则说明初始化成功，您可以开始通过Http请求访问gAnswer的服务了。
 
-这部分信息可以在帮助文档的‘“2.1.1 开始使用”’一章找到。
+###通过http请求使用GAnswer
+我们为您提供了一个简单的样例，以说明如何通过http请求，获取GAnswer服务。
+您可以通过类似下面的url来访问GAnswer：
+http://[ip]:[port]/gSolve/?data={%22maxAnswerNum%22:%221%22,%22maxSparqlNum%22:%222%22,%22question%22:%22Who%20is%20the%20wife%20of%20Donald%20Trump?%22}
+其中，[ip]和[port]分别为您启动GAnswer服务的ip地址和端口（端口系统默认为9999），您需要通过在http请求中添加“data”参数，传递一个json字符串给GAnswer。
+在这个样例中，您实际传递的json数据为：
+```json
+{
+  "maxAnswerNum":"1",
+  "maxSparqlNum":"2",
+  "question":"Whos is the wife of Donald Trump?"
+}
+```
+其中，maxAnswerNum和maxSparqlNum分别规定了返回的答案和sparql的数量上限，这两个数据项都是可选的。
+一般情况下，这时GAnswer会返回一个json字符串，其中包含了系统生成的sparql和问题答案。
+```json
+{
+  "question":"Who is the wife of Donald Trump?",
+  "vars":["?wife"],
+  "sparql":["select DISTINCT ?wife  where { <Donald_Trump>\t<spouse>\t?wife. } LIMIT 1","select DISTINCT ?wife  where { ?wife\t<spouse>\t<Donald_Trump>. } LIMIT 1"],
+  "results":{"bindings":[{"?wife":{"type":"uri","value":"<Ivana_Trump>"}}]},
+  "status":"200"
+}
+```
+详细信息可以在帮助文档的‘“2.1.1 开始使用”’一章找到。
 
 
 
