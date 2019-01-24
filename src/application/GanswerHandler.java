@@ -22,7 +22,7 @@ public class GanswerHandler extends AbstractHandler{
 		try {
 			exobj.put("status", status);
 			exobj.put("message", message);
-			exobj.put("query", question);
+			exobj.put("question", question);
 			if(qlog!=null&&qlog.rankedSparqls!=null&&qlog.rankedSparqls.size()>0){
 				exobj.put("sparql", qlog.rankedSparqls.get(0).toStringForGStore2());
 			}
@@ -46,9 +46,18 @@ public class GanswerHandler extends AbstractHandler{
 	        int needSparql = 1;
 	        question = "Show me all Czech movies";
 			jsonobj = new JSONObject(data);
-			needAnswer = jsonobj.getInt("maxAnswerNum");
-			needSparql = jsonobj.getInt("needSparql");
-			question = jsonobj.getString("questions");
+			question = jsonobj.getString("question");
+			if(jsonobj.isNull("maxAnswerNum")){
+				needAnswer = GanswerHttp.maxAnswerNum;
+			}
+			else{
+				needAnswer = jsonobj.getInt("maxAnswerNum");
+			}
+			if(jsonobj.isNull("maxSparqlNum")){
+				needSparql = GanswerHttp.maxSparqlNum;
+			}else{
+				needSparql = jsonobj.getInt("maxSparqlNum");
+			}
 			Globals.MaxAnswerNum = needAnswer;
 	        
 	        //step2 run GAnswer Logic
@@ -68,7 +77,7 @@ public class GanswerHandler extends AbstractHandler{
 			//step2 construct response
 			JSONObject resobj = new JSONObject();
 			resobj.put("status", "200");
-			resobj.put("query",jsonobj.getString("questions"));
+			resobj.put("question",jsonobj.getString("question"));
 			JSONObject tmpobj = new JSONObject();
 			if(needAnswer > 0){
 				if(qlog!=null && qlog.rankedSparqls.size()!=0){
