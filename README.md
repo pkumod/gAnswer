@@ -38,7 +38,7 @@ java -jar Ganswer.jar
 我们为您提供了一个简单的样例，以说明如何通过http请求，获取GAnswer服务。
 您可以通过类似下面的url来访问GAnswer：
 http://[ip]:[port]/gSolve/?data={%22maxAnswerNum%22:%221%22,%22maxSparqlNum%22:%222%22,%22question%22:%22Who%20is%20the%20wife%20of%20Donald%20Trump?%22}
-其中，[ip]和[port]分别为您启动GAnswer服务的ip地址和端口（端口系统默认为9999），您需要通过在http请求中添加“data”参数，传递一个json字符串给GAnswer。
+<br />其中，[ip]和[port]分别为您启动GAnswer服务的ip地址和端口（端口系统默认为9999），您需要通过在http请求中添加“data”参数，传递一个json字符串给GAnswer。
 在这个样例中，您实际传递的json数据为：
 ```json
 {
