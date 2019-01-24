@@ -34,7 +34,7 @@ java -jar Ganswer.jar
 ```
 - 等待系统初始化结束，出现Server Ready！字样后，则说明初始化成功，您可以开始通过Http请求访问gAnswer的服务了。
 
-###通过http请求使用GAnswer
+### 通过http请求使用GAnswer
 我们为您提供了一个简单的样例，以说明如何通过http请求，获取GAnswer服务。
 您可以通过类似下面的url来访问GAnswer：
 http://[ip]:[port]/gSolve/?data={%22maxAnswerNum%22:%221%22,%22maxSparqlNum%22:%222%22,%22question%22:%22Who%20is%20the%20wife%20of%20Donald%20Trump?%22}
