@@ -95,6 +95,7 @@ public class ParaphraseDictionary {
 			loadDboPredicate();
 			loadParaDict();
 			buildInvertedIndex();
+			typePredicateID = predicate_2_id.get("type"); 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
