@@ -36,8 +36,7 @@ public class ParaphraseDictionary {
 	public HashSet<String> prepositions;
 	public HashSet<String> bannedTypes;
 	
-	//public final int typePredicateID = 1541;	//dbpedia2015 <type>=1541
-	public int typePredicateID = 5157;	//Dbpedia 2016 <type>=5166
+	public int typePredicateID = 5157;	//Dbpedia 2016 <type>=5157 | It will be updated according the dataset
 	public int totalPredCount = 0;
 	public int paraphrasedPredCount = 0;
 	public int lineCount = 0;
