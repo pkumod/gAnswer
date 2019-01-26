@@ -8,7 +8,7 @@ GAnswer系统是由北京大学计算机技术研究所数据管理实验室邹�
 
 ## 快速开始
 首先您需要从[此处](https://pan.baidu.com/s/1LHGO0cU5et5o5nQWc3UvVg)下载系统必需的数据文件dbpedia16.rar，提取码为1mcr，您需要将其解压到data文件夹下。
-由于完整的数据文件需要较大的内存支持（20GB），您也可以选择下载我们从DBpedia 2016中抽取生成的[小规模数据](https://pan.baidu.com/s/1Txe_cwpuoohJXH70yfxB-Q)，提取码为zuue。注意，问答系统在小规模数据集上的能力是受限的，在[官网](http://ganswer.gstore-pku.com/)的问题样例和QALD系列问题之外，您可能需要根据数据文件自行选择合适的问题来进行测试。
+由于完整的数据文件需要较大的内存支持（20GB），您也可以选择下载我们从DBpedia 2016中抽取生成的[小规模数据](https://pan.baidu.com/s/1Txe_cwpuoohJXH70yfxB-Q)（需要5GB内存），提取码为zuue。注意，问答系统在小规模数据集上的能力是受限的，在[官网](http://ganswer.gstore-pku.com/)的问题样例和QALD系列问题之外，您可能需要根据数据文件自行选择合适的问题来进行测试。
 
 ### 使用jar包部署
 我们推荐您使用我们提供的打包好的jar文件部署gAnswer，具体步骤为：
