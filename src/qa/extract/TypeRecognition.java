@@ -24,15 +24,10 @@ import rdf.TypeMapping;
  * 3、Add some extend variable, (generalization of [variable with inherit type] -> [variable with inherit triples]) eg, ?canadian <birthPlace> <Canada>
  * */
 public class TypeRecognition {
-	// dbpedia 2014
-	//public static final int[] type_Person = {180,279};
-	//public static final int[] type_Place = {49,228};
-	//public static final int[] type_Organisation = {419,53};
 	
-	//dbpedia 2016
-	public static final int[] type_Person = {5828,15985};
-	public static final int[] type_Place = {11197,2188};
-	public static final int[] type_Organisation = {1335,4716};
+	public static ArrayList<Integer> type_Person = new ArrayList<Integer>();
+	public static ArrayList<Integer> type_Place = new ArrayList<Integer>();
+	public static ArrayList<Integer> type_Organisation = new ArrayList<Integer>();
 	
 	public static HashMap<String, String> extendTypeMap = null; 
 	public static HashMap<String, Triple> extendVariableMap = null;
@@ -53,6 +48,23 @@ public class TypeRecognition {
 		extendTypeMap.put("USStates", "yago:StatesOfTheUnitedStates");
 		extendTypeMap.put("Europe", "yago:EuropeanCountries");
 		extendTypeMap.put("Africa", "yago:AfricanCountries");
+		
+		//Types for wh-word
+		if(TypeFragment.typeShortName2IdList != null)
+		{
+			if(TypeFragment.typeShortName2IdList.containsKey("Person"))
+				type_Person.addAll(TypeFragment.typeShortName2IdList.get("Person"));
+			if(TypeFragment.typeShortName2IdList.containsKey("NaturalPerson"))
+				type_Person.addAll(TypeFragment.typeShortName2IdList.get("NaturalPerson"));
+			if(TypeFragment.typeShortName2IdList.containsKey("Location"))
+				type_Place.addAll(TypeFragment.typeShortName2IdList.get("Location"));
+			if(TypeFragment.typeShortName2IdList.containsKey("Place"))
+				type_Place.addAll(TypeFragment.typeShortName2IdList.get("Place"));
+			if(TypeFragment.typeShortName2IdList.containsKey("Organisation"))
+				type_Organisation.addAll(TypeFragment.typeShortName2IdList.get("Organisation"));
+			if(TypeFragment.typeShortName2IdList.containsKey("Organization"))
+				type_Organisation.addAll(TypeFragment.typeShortName2IdList.get("Organization"));
+		}
 	}
 	
 	public static void recognizeExtendVariable(Word w)

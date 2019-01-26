@@ -274,7 +274,6 @@ public class GAnswer {
 						outputs.add("[" + Math.min(MAX_SPQ_NUM+1, idx) + "]" + "score=" + 1000 + "\n" + stdSPQwoPrefix + "\n");
 				}
 			}
-			outputs.add(qlog.match.toString());
 			
 			FileUtil.writeFile(outputs, "E:/Linyinnian/qald6_special_out.txt", true);
 		}
