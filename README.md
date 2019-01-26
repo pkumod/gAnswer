@@ -21,7 +21,7 @@ jar -xvf Ganswer.jar
 - 您应该解压到主工程目录下，请保证Ganswer.jar文件与解压得到的文件处在同一路径下。
 - 在控制台下解压dbpedia16.rar，注意，这时，您需要把解压得到的文件置于Ganswer.jar文件所在的路径的data文件夹下。下方的示例默认dbpedia16.rar与Ganswer.jar已经处于同一文件夹下。
 ```java
-unrar x dbpedia16.rar ./data/
+unrar x DBpedia2016.rar ./data/
 ```
 - 这时，您现在的工程目录结构应该是这样的：
 >Main_project_directory
