@@ -124,9 +124,9 @@ public class GanswerHandler extends AbstractHandler{
 						bindingobj = new JSONObject();
 						for(String var:qlog.sparql.variables){
 							JSONObject bidobj = new JSONObject();
-							String[] ansRiv = qlog.match.answers[i][j].split(":");
-							bidobj.put("value", ansRiv[ansRiv.length-1]);
-							if(ansRiv[ansRiv.length-1].startsWith("<"))
+							String ansRiv = qlog.match.answers[i][j].substring(qlog.match.answers[i][j].indexOf(":")+1);
+							bidobj.put("value", ansRiv);
+							if(ansRiv.startsWith("<"))
 								bidobj.put("type", "uri");
 							else
 								bidobj.put("type", "literal");
