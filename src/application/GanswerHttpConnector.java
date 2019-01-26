@@ -99,7 +99,7 @@ public class GanswerHttpConnector {
     
     public static void main(String[] args){
     	GanswerHttpConnector ghc = new GanswerHttpConnector();
-    	String data = "{\"maxAnswerNum\":\"3\",\"needSparql\":\"2\",\"questions\":\"Who is the wife of Barack Obama?\"}";
+    	String data = "{\"maxAnswerNum\":\"3\",\"needSparql\":\"2\",\"question\":\"Who is the president of China?\"}";
     	ghc.gInfo();
     	ghc.gSolve(data);
     }

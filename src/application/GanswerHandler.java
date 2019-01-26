@@ -44,7 +44,7 @@ public class GanswerHandler extends AbstractHandler{
 	        JSONObject jsonobj = new JSONObject();
 	        int needAnswer = 0;
 	        int needSparql = 1;
-	        question = "Show me all Czech movies";
+	        question = "Something wrong if you see this.";
 			jsonobj = new JSONObject(data);
 			question = jsonobj.getString("question");
 			if(jsonobj.isNull("maxAnswerNum")){
@@ -67,7 +67,7 @@ public class GanswerHandler extends AbstractHandler{
 	        if(qlog == null || qlog.rankedSparqls == null){
 				try {
 					baseRequest.setHandled(true);
-					response.getWriter().println(errorHandle("500","UnvalidQuestionException: the question you input is invalid, please check",question,qlog));
+					response.getWriter().println(errorHandle("500","InvalidQuestionException: the question you input is invalid, please check",question,qlog));
 				} catch (Exception e1) {
 				}
 	        	return;
@@ -94,13 +94,15 @@ public class GanswerHandler extends AbstractHandler{
 							break;
 						}
 					}
-					curSpq = ga.getUntypedSparql(curSpq);
-					if(curSpq!=null){
-						m = ga.getAnswerFromGStore2(curSpq);
-					}
-					if(m!=null&&m.answers!=null){
-						qlog.sparql = curSpq;
-						qlog.match = m;
+					if(m==null||m.answers==null){
+						curSpq = ga.getUntypedSparql(curSpq);
+						if(curSpq!=null){
+							m = ga.getAnswerFromGStore2(curSpq);
+						}
+						if(m!=null&&m.answers!=null){
+							qlog.sparql = curSpq;
+							qlog.match = m;
+						}
 					}
 					if(qlog.match==null)
 						qlog.match=new Matches();
@@ -142,8 +144,10 @@ public class GanswerHandler extends AbstractHandler{
 			}
 			if(needSparql>0){
 				JSONArray spqarr = new JSONArray();
-				for(idx=0;idx<needSparql&&idx<qlog.rankedSparqls.size();idx+=1){
-					spqarr.put(qlog.rankedSparqls.get(idx).toStringForGStore2());
+				spqarr.put(qlog.sparql.toStringForGStore2());
+				for(idx=0;idx<needSparql-1&&idx<qlog.rankedSparqls.size();idx+=1){
+					if(qlog.sparql.toStringForGStore2().compareTo(qlog.rankedSparqls.get(idx).toStringForGStore2()) != 0)
+						spqarr.put(qlog.rankedSparqls.get(idx).toStringForGStore2());
 				}
 				resobj.put("sparql", spqarr);
 			} 
