@@ -73,7 +73,7 @@ http://[ip]:[port]/gSolve/?data={maxAnswerNum:1, maxSparqlNum:2, question:Who is
 因此我们强烈建议您在自己的服务器上部署gStore查询引擎并建立对应的知识库。您需要：
 
 - 下载[DBpedia2016 triples文件](https://pan.baidu.com/s/1l5Oui65sDn8QPYmA0rUvuA)，提取码89yy。
-- 部署[gStore](http://gstore-pku.com)查询引擎，并使用1中下载的triples文件来构建数据库。
+- 部署[gStore](http://gstore-pku.com)查询引擎，并使用下载的triples文件来构建数据库。
 
 ## 其他事项
 
