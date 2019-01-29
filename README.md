@@ -71,8 +71,9 @@ http://[ip]:[port]/gSolve/?data={maxAnswerNum:1, maxSparqlNum:2, question:Who is
 要运行gAnswer系统，需要较多的包依赖、文件依赖和外部接口依赖，关于这部分要求，请您参阅帮助文档的“2.4 安装指南”。
 在生成SPARQL查询后，系统默认调用部署在远程服务器上的gStore查询引擎来查找答案。这意味着额外的网络传输开销和可能存在的排队等待开销。
 因此我们强烈建议您在自己的服务器上部署gStore查询引擎并建立对应的知识库。您需要：
-1、下载[DBpedia2016 triples文件](https://pan.baidu.com/s/1l5Oui65sDn8QPYmA0rUvuA)，提取码89yy。
-2、部署[gStore](http://gstore-pku.com)查询引擎，并使用1中下载的triples文件来构建数据库。
+
+- 下载[DBpedia2016 triples文件](https://pan.baidu.com/s/1l5Oui65sDn8QPYmA0rUvuA)，提取码89yy。
+- 部署[gStore](http://gstore-pku.com)查询引擎，并使用1中下载的triples文件来构建数据库。
 
 ## 其他事项
 
