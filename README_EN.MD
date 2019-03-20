@@ -4,7 +4,7 @@ GAnswer system is a natural language QA system developed by Institute of Compute
 
 This is an implementation for TKDE 2018 paper [Answering Natural Language Questions by Subgraph Matching over Knowledge Graphs](docs/TKDE18_gAnswer.pdf) 
 
-**For help document, click here [中文(ZH)](docs/gAnswer_help.pdf), the english version will be uploaded as soon as possible**
+**For help document, click here [中文(ZH)](docs/gAnswer_help.pdf), [English](docs/gAnswer_help_en.pdf)
 
 ## Quick Start
 First you must download necessary data files dbpedia16.rar [here](https://pan.baidu.com/s/1LHGO0cU5et5o5nQWc3UvVg). The extaction code is 1mcr. You should unzip the file into directory named data.
