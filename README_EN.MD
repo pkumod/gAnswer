@@ -7,7 +7,7 @@ This is an implementation for TKDE 2018 paper [Answering Natural Language Questi
 **For help document, click here [中文(ZH)](docs/gAnswer_help.pdf), [English](docs/gAnswer_help_en.pdf)
 
 ## Quick Start
-First you must download necessary data files dbpedia16.rar [here](https://pan.baidu.com/s/1LHGO0cU5et5o5nQWc3UvVg). The extaction code is 1mcr. You should unzip the file into directory named data.
+First you must download necessary data files dbpedia16.rar [here](https://pan.baidu.com/s/1LHGO0cU5et5o5nQWc3UvVg). The extaction code is 1mcr. This is a Baidu Netdisk link. If you have trouble opening it, please try this google drive [link](https://drive.google.com/open?id=1hmqaftrTo0_qQNRApCuxFXaBx7SosNVy).You should unzip the file into directory named data.
 
 ### Deploy GAnswer via jar
 We recommend you to deploy GAnswer using the jar files we supply. The specific procedure is as follows：
