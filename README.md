@@ -4,7 +4,7 @@ GAnswer系统是由北京大学计算机技术研究所数据管理实验室邹�
 
 这是TKDE 2018论文 [Answering Natural Language Questions by Subgraph Matching over Knowledge Graphs](docs/TKDE18_gAnswer.pdf) 的代码实现。
 
-**帮助文档请点击此处 [中文(ZH)](docs/gAnswer_help.pdf)**
+**帮助文档请点击此处 [中文(ZH)](docs/gAnswer_help.pdf) [English](docs/gAnswer_help_en.pdf)**
 
 ## 快速开始
 首先您需要从[此处](https://pan.baidu.com/s/1LHGO0cU5et5o5nQWc3UvVg)下载系统必需的数据文件dbpedia16.rar，提取码为1mcr，您需要将其解压到data文件夹下。
