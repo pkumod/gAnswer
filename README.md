@@ -7,7 +7,7 @@ This is an implementation for TKDE 2018 paper [Answering Natural Language Questi
 **For help document, click here [中文(ZH)](docs/gAnswer_help.pdf), [English](docs/gAnswer_help_en.pdf)
 
 ## Quick Start
-First you must download necessary data files dbpedia16.rar [here](https://pan.baidu.com/s/1LHGO0cU5et5o5nQWc3UvVg). The extaction code is 1mcr. This is a Baidu Netdisk link. If you have trouble opening it, please try this google drive [link](https://drive.google.com/open?id=1hmqaftrTo0_qQNRApCuxFXaBx7SosNVy).You should unzip the file into directory named data.
+First you must download necessary data files dbpedia16.rar [here](https://pan.baidu.com/s/1LHGO0cU5et5o5nQWc3UvVg). The extaction code is 1mcr. This is a Baidu Netdisk link. If you have trouble opening it, please try this google drive [link](https://drive.google.com/open?id=1hmqaftrTo0_qQNRApCuxFXaBx7SosNVy).You should unzip the file into directory named data.Since the complete data require at least 20 GB of main memory, you may try a [smaller dataset](https://pan.baidu.com/s/1Txe_cwpuoohJXH70yfxB-Q) (5GB required). The extract code is zuue. Please notice that the system performance is limited on the small data. We make sure that this data set is capable for example questions on our [official website](http://ganswer.gstore-pku.com/) as well as in QALD data set. Otherwise, you should choose suitable question for testing based on the data files.
 
 ### Deploy GAnswer via jar
 We recommend you to deploy GAnswer using the jar files we supply. The specific procedure is as follows：
@@ -36,7 +36,32 @@ java -jar Ganswer.jar
 
 About GAnswer Http API, information can be found in Chapter 2.1.1 in help document.
 
-
+### Use GAnswer via http request
+Here is an example of how to call GAnswer service via http request.
+Having started GAnswerHttp, you can activate GAnswer by url as follow:
+http://[ip]:[port]/gSolve/?data={maxAnswerNum:1, maxSparqlNum:2, question:Who is the wife of Donald Trump?}
+<br />
+Here,[ip] and [port] is the ip and port number of GAnswerHttp service (the default port is 9999). By the "data" parameter in the url, you can send a json string to GAnswer.
+In this example, you are actually sending the following json data：
+```json
+{
+  "maxAnswerNum":"1",
+  "maxSparqlNum":"2",
+  "question":"Whos is the wife of Donald Trump?"
+}
+```
+Here, maxAnswerNum and maxSparqlNum respetively limit the number of answers and sparql the system will return. Both of them are optional.
+If everything goes well, GAnswer will return a json string containing system-generated sparql and corresponding answer.
+```json
+{
+  "question":"Who is the wife of Donald Trump?",
+  "vars":["?wife"],
+  "sparql":["select DISTINCT ?wife  where { <Donald_Trump>\t<spouse>\t?wife. } LIMIT 1","select DISTINCT ?wife  where { ?wife\t<spouse>\t<Donald_Trump>. } LIMIT 1"],
+  "results":{"bindings":[{"?wife":{"type":"uri","value":"<Ivana_Trump>"}}]},
+  "status":"200"
+}
+```
+For more detail, please check Chapter 2.1.1 of the user guide.
 
 ### Run GAnswer in Eclipse
 If you would like to run GAnswer in Eclipse, you need to clone or download the source code and import the project into Eclipse. Afterwards, the jar files in lib directory should be added to Build Path.
@@ -45,6 +70,10 @@ Meanwhile, dbpedia16.rar is also needed. Please unzipped it into directory named
 
 ### Notice
 To run GAnswer, you have to deal with multiple dependencies involving jar, data files and external API. Related information is in Chapter 2.4 in the help document.
+Having generated sparql querires, by default the system will access a remote gStore for answer, which means extra time may be needed.Therefore, we strongly recommend you to deploy gStore on your own server for best performance.
+
+- Download [DBpedia2016 triple file](https://pan.baidu.com/s/1l5Oui65sDn8QPYmA0rUvuA) and extract code is 89yy.
+- Deploy [gStore](http://gstore-pku.com) and use DBpedia2016 triple file to build your own database. What's worth mentioning is that the DBpedia 2016 triples file is about 9.9GB and the construction needs more than 10GB of main memory and costs more about 10 hours.
 
 ## Other Business
 
