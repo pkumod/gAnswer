@@ -63,7 +63,7 @@ Finally we are going to generate entity fragments now. Every entity has its own 
 ```java
 <StudentA>  <major>  <computer_science>
 ```
-Here *studentA* is subject, *major* is predicate and *computer_science* is object. Basically, the first element is subject, the second is predicate and the third is object. Sometimes it is the object is not an entity nor type. Value like number and string can also become object.
+Here *studentA* is subject, *major* is predicate and *computer_science* is object. Basically, the first element is subject, the second is predicate and the third is object. Sometimes it is the object, not an entity nor type. Value like number and string can also become object.
 
 We define 5 kinds of edges:
 1.InEntEdge: The entity is the object of the edge and the subject is also an entity.
