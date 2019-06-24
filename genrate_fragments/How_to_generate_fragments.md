@@ -12,6 +12,7 @@ Suppose we have a triple file containing only seven triples:
 <StudentB>  <type>   <Person>
 <computer_science>  <type>  <Subject>
 ```
+Generally speaking, there are three segment
 This is the exactly form of triples we need to generate fragments. However sometimes the entity and predicate contain some extra information. Take dbpedia dataset as an example. The following is the original form of a dbpedia triple
 ```java
 <http://dbpedia.org/resource/Alabama> <http://dbpedia.org/property/demonym> <http://dbpedia.org/resource/Adjectivals_and_demonyms_for_U.S._states> .
@@ -22,7 +23,7 @@ By the way, if you have more than one triple files, please combine them into one
 
 ### Step 2: remove duplicate triples
 One triple may occur more than once in the clean triple file, especially when you combine many triple files into one.
-gAnswer is OK with receving duplicate triples but it will influence its performance.
+gAnswer is OK with receiving duplicate triples but it will influence its performance.
 
 ### Step 3: extract entity, predicate and type name for id allocation
 To save space cost, the fragment files are not constructed based on entity, predicate and type names themselves but their ids. Therefore, we must extract every entity, predicate and type name out of the triple file and give them a uniue id respectively. In our example,the id files will goes like this:
@@ -55,3 +56,18 @@ In our example, the new triple file is like:
 2 3 1
 3 3 2
 ```
+Notice that we use -1 to represent values that a not entity nor type, such as numbers and literals.
+
+### Step 5: generate entity fragments
+Finally we are going to generate entity fragments now. Every entity has its own piece of fragment.Fragments are information about the edges related with the entity as well as its neighbor entities.First let's clearify the idea of subject and object in a triple. A triple consist of three parts: subject, predicate and object. For example:
+```java
+<StudentA>  <major>  <computer_science>
+```
+Here *studentA* is subject, *major* is predicate and *computer_science* is object. Basically, the first element is subject, the second is predicate and the third is object. Sometimes it is the object is not an entity nor type. Value like number and string can also become object.
+
+We define 5 kinds of edges:
+1.InEntEdge: The entity is the object of the edge and the subject is also an entity.
+2.OutEntEdge: The entity is the subject of the edge and the object is also an entity.
+3.InEdge: The entity is the object of the edge.
+4.OutEdge: The entity is the subject of the edge.
+5.typeEdge: The entity ts the subject of the edge whose predicate is *type* and its object is a type.
