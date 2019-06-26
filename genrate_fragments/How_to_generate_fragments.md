@@ -6,6 +6,7 @@ Suppose we have a triple file containing only seven triples:
 ```java
 <StudentA>  <major>  <computer_science>
 <StudentB>  <friend_of> <StudentA>
+<StudentB>  <deskmate_of> <StudentA>
 <StudentA>  <name>  "Jeff"
 <StudentB>  <name>  "Tom"
 <StudentA>  <type>   <Person>
@@ -38,6 +39,7 @@ To save space cost, the fragment files are not constructed based on entity, pred
 <friend_of> 2
 <type>  3
 <name>  4
+<deskmate_of> 5
 
 //type ids
 <Person>  1
@@ -71,3 +73,55 @@ We define 5 kinds of edges:
 3.InEdge: The entity is the object of the edge.
 4.OutEdge: The entity is the subject of the edge.
 5.typeEdge: The entity ts the subject of the edge whose predicate is *type* and its object is a type.
+
+Therefore, the structure of a piece of entity fragment is as follow:
+```java
+<entity id> <InEntEdge list> | <OutEntEdge list> | <InEdge list> | <OutEdge list> | <Type list>
+```
+Between entity id and InEntEdge list, there should be a \t as divider.
+
+InEntEdge list and OutEntEdge list should be:
+```java
+<Subject or object entity id 1> : <Predicate id 1.1> ; <Predicate id 1.2> ; ...... , <Subject or object entity id 2> : <Predicate id 2.1> ; <Predicate id 2.2> ; ......
+```
+InEdge, OutEdge and Type list is similar but simpler.
+```java
+<Subject or object entity or type id 1> , <Subject or object entity or type id 2>, <Subject or object entity or type id 3>......
+```
+
+Let's go back to our example. For entity *studentA*, its entity fragment should be:
+```java
+1   2:2;5 | 3:1 | 2 | 1,4 | 1 
+```
+The id of *studentA* is 1. So at the beginning of the entity fragment we have a 1. Then we find InEntEdge, OutEntEdge, InEdge, OutEdge and Type list one by one and add them to the entity fragment.
+
+### Step 6: Generate type fragment
+Given a specific type, type fragment contains three kinds of information: predicate ids in an InEdge of an entity of this type, predicate ids in an OutEdge of an entity of this type, and all the ids of entity of this type. The structure should be:
+```java
+<Type id> <InEdge predicate list> | <OutEdge predicate list> | <Entity list>
+```
+In our example, the type fragement of *Person* should be:
+```java
+1 2,5 | 1,4 | 1,2
+```
+
+### Step 7: Generate predicate fragment
+Given a specific predicate, there will be more than one piece of predicate fragment. Every piece of predicate fragment comes from a piece triple. We record the types that a predicate may accept as subject or object. Sometimes the object is not an entity and we use *literal* to denote this situation.
+The structure of a piece of predicate fragment is:
+```java
+[<Type list of the subject entity>] <predicate id>  [<Type list of the object entity> or "literal"]
+```
+For predicate *friend_of*, the predicate fragment should be:
+```java
+[1] 2 [1]
+```
+
+For predicate *name*, the predicate fragment should be:
+```java
+[1] 4 literal
+```
+
+Please notice that between type lists, predicate id and "literal", \t should be the divider.
+
+### Step 8: Rebuild the lucene fragment for entity fragment and type short name
+This is the final step to make gAnswer run on our new data fragments. You can find the relative code under src/lcn/BuildIndexForEntityFragments.java and src/lucene/BuildIndexForTypeShortName.java. All you need to do is to import the project into eclipse and modify the file paths in the relative code and then run the main function in src/lcn/BuildIndexForEntityFragments.java and src/lucene/BuildIndexForTypeShortName.java.
