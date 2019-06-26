@@ -84,3 +84,5 @@ http://[ip]:[port]/gSolve/?data={maxAnswerNum:1, maxSparqlNum:2, question:Who is
 我们针对QA任务和gAnswer系统发表了多篇论文，您可以在帮助文档的“3.2 出版物”一章找到相关信息。
 
 
+## 在gAnswer上使用你自己的数据
+如果您希望将您自己的三元组数据集移植到gAnswer上，那么您需要利用这些三元组为gAnswer重新生成fragments。 我们提供了一个[详细的教程](genrate_fragments/How_to_generate_fragments.md)来帮助您完成这项工作。
