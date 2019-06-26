@@ -83,3 +83,6 @@ If your advice or report are accepted, your contribution will be recorded in our
 
 We have published some paper about GAnswer and QA task, which you can find in Chapter 3.2 in help document.
 
+## How to make your own data available on gAnswer
+You may have your own set of triples and want to put them into gAnswer.Then you should generate a new set of fragments from your own triples. We have a [detailed tutorial](genrate_fragments/How_to_generate_fragments.md) to help you out.
+
