@@ -21,13 +21,10 @@ public class Main {
 					break;
 				try {
 					long t1 = System.currentTimeMillis();
-					Sentence s = new Sentence(question);
+					Sentence s = null;
 					DependencyTree dt = new DependencyTree(s, Globals.stanfordParser);
 					System.out.println("====StanfordDependencies====");
 					System.out.println(dt);
-					DependencyTree dt2 = new DependencyTree(s, Globals.maltParser);
-					System.out.println("====MaltDependencies====");
-					System.out.println(dt2);
 					long t2 = System.currentTimeMillis();
 					System.out.println("time=" + (t2-t1) + "ms");
 				} catch (Exception e) {

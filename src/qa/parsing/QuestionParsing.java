@@ -16,36 +16,20 @@ public class QuestionParsing {
 	}
 	
 	public void getDependenciesAndNER (QueryLogger qlog) {
-		long t1 = System.currentTimeMillis();
 		try {
+			long t1 = System.currentTimeMillis();
+			
 			qlog.s.dependencyTreeStanford = new DependencyTree(qlog.s, Globals.stanfordParser);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-		long t2 = System.currentTimeMillis();
-		try{
-			qlog.s.dependencyTreeMalt = new DependencyTree(qlog.s, Globals.maltParser);
-		}catch(Exception e){
-			//if errors occur, abandon malt tree
-			qlog.s.dependencyTreeMalt = qlog.s.dependencyTreeStanford;
-			System.err.println("MALT parser error! Use stanford parser instead.");
-		}					
-		
-		try {
-			long t3 = System.currentTimeMillis();
-			Globals.nerRecognizer.recognize(qlog.s);
-			long t4 = System.currentTimeMillis();
+			
+			long t2 = System.currentTimeMillis();
+//			Globals.nerRecognizer.recognize(qlog.s);	//TODO: check NER
+			
 			System.out.println("====StanfordDependencies("+(t2-t1)+"ms)====");
 			System.out.println(qlog.s.dependencyTreeStanford);
-			System.out.println("====MaltDependencies("+(t3-t2)+"ms)====");
-			System.out.println(qlog.s.dependencyTreeMalt);
-			System.out.println("====NameEntityRecognition("+(t4-t3)+"ms)====");
-			qlog.s.printNERResult();
+//			qlog.s.printNERResult();
 			
 			qlog.timeTable.put("StanfordParser", (int)(t2-t1));
-			qlog.timeTable.put("MaltParser", (int)(t3-t2));
-			qlog.timeTable.put("NER", (int)(t4-t3));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -53,8 +37,7 @@ public class QuestionParsing {
 	
 	public void recognizeSentenceType(QueryLogger qlog)
 	{
-		boolean IsImperativeSentence = recognizeImperativeSentence(qlog.s.dependencyTreeStanford)||
-									   recognizeImperativeSentence(qlog.s.dependencyTreeMalt);
+		boolean IsImperativeSentence = recognizeImperativeSentence(qlog.s.dependencyTreeStanford);
 		if (IsImperativeSentence)
 		{
 			qlog.s.sentenceType = SentenceType.ImperativeSentence;
@@ -66,16 +49,14 @@ public class QuestionParsing {
 			return;
 		}
 		
-		boolean IsSpecialQuestion = recognizeSpecialQuestion(qlog.s.dependencyTreeStanford)||
-									recognizeSpecialQuestion(qlog.s.dependencyTreeMalt);
+		boolean IsSpecialQuestion = recognizeSpecialQuestion(qlog.s.dependencyTreeStanford);
 		if (IsSpecialQuestion)
 		{
 			qlog.s.sentenceType = SentenceType.SpecialQuestion;
 			return;
 		}
 		
-		boolean IsGeneralQuestion = recognizeGeneralQuestion(qlog.s.dependencyTreeStanford)||
-									recognizeGeneralQuestion(qlog.s.dependencyTreeMalt);
+		boolean IsGeneralQuestion = recognizeGeneralQuestion(qlog.s.dependencyTreeStanford);
 		if (IsGeneralQuestion)
 		{
 			qlog.s.sentenceType = SentenceType.GeneralQuestion;

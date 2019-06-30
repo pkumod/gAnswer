@@ -8,26 +8,18 @@ import lcn.EntityFragmentFields;
 import fgmt.RelationFragment;
 import fgmt.TypeFragment;
 import paradict.ParaphraseDictionary;
-import qa.mapping.DBpediaLookup;
-import nlp.tool.NERecognizer;
-import nlp.tool.CoreNLP;
-import nlp.tool.MaltParser;
 import nlp.tool.StanfordParser;
 import nlp.tool.StopWordsList;
 
 public class Globals {
 	// nlp tools
-	public static CoreNLP coreNLP;
 	public static StanfordParser stanfordParser;
 	public static StopWordsList stopWordsList;
-	public static MaltParser maltParser;
-	public static NERecognizer nerRecognizer;
 	// relation paraphrase dictionary
 	public static ParaphraseDictionary pd;
 	// entity linking system
-	public static DBpediaLookup dblk;
 	public static int MaxAnswerNum = 100;
-	public static String Dataset = "dbpedia 2016";
+	public static String Dataset = "pkubase";
 	public static String Version = "0.1.2";
 	public static String GDBsystem = "gStore v0.7.2";
 	
@@ -39,34 +31,25 @@ public class Globals {
 	public static int evaluationMethod = 2; 
 	
 	public static String localPath = "./././";
-	public static String QueryEngineIP = "dbpedia16.gstore-pku.com";	// Notice, PORT number is in the evaluation function.
+	public static String QueryEngineIP = "pkubase.gstore-pku.com";	// Notice, PORT number is in the evaluation function.
 	public static int QueryEnginePort = 80;
 	
 	public static void init () 
 	{
-		System.out.println("====== gAnswer2.0 over DBpedia ======");
+		System.out.println("====== gAnswer2.0 over Pkubase ======");
 
 		long t1, t2, t3, t4, t5, t6, t7, t8, t9;
 		
 		t1 = System.currentTimeMillis();
-		coreNLP = new CoreNLP();
-		
-		t2 = System.currentTimeMillis();
 		stanfordParser = new StanfordParser();
 		
-		t3 = System.currentTimeMillis();
-		maltParser = new MaltParser();
-		
-		t4 = System.currentTimeMillis();
-		nerRecognizer = new NERecognizer();
-		
-		t5 = System.currentTimeMillis();
+		t2 = System.currentTimeMillis();
 		stopWordsList = new StopWordsList();
 		
-		t6 = System.currentTimeMillis();
+		t3 = System.currentTimeMillis();
 		pd = new ParaphraseDictionary();
 		
-		t7 = System.currentTimeMillis();
+		t4 = System.currentTimeMillis();
 		try 
 		{	
 			EntityFragmentFields.load();
@@ -78,20 +61,13 @@ public class Globals {
 			e1.printStackTrace();
 		}
 		
-		t8 = System.currentTimeMillis();
-		dblk = new DBpediaLookup();
-		
-		t9 = System.currentTimeMillis();
+		t5 = System.currentTimeMillis();
 		System.out.println("======Initialization======");
-		System.out.println("CoreNLP(Lemma): " + (t2-t1) + "ms.");
-		System.out.println("StanfordParser: " + (t3-t2) + "ms.");
-		System.out.println("MaltParser: " + (t4-t3) + "ms.");
-		System.out.println("NERecognizer: " + (t5-t4) + "ms.");
-		System.out.println("StopWordsList: " + (t6-t5) + "ms.");
-		System.out.println("ParaphraseDict & posTagPattern: " + (t7-t6) + "ms.");
-		System.out.println("GraphFragments: " + (t8-t7) + "ms.");
-		System.out.println("DBpediaLookup: " + (t9-t8) + "ms.");
-		System.out.println("* Total *: " + (t9-t1) + "ms.");
+		System.out.println("StanfordParser: " + (t2-t1) + "ms.");
+		System.out.println("StopWordsList: " + (t3-t2) + "ms.");
+		System.out.println("ParaphraseDict: " + (t4-t3) + "ms.");
+		System.out.println("GraphFragments: " + (t5-t4) + "ms.");
+		System.out.println("* Total *: " + (t5-t1) + "ms.");
 		System.out.println("==========================");
 	}
 

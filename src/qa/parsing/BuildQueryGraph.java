@@ -37,84 +37,19 @@ public class BuildQueryGraph
 	
 	public BuildQueryGraph()
 	{
-		whList.add("what");
-		whList.add("which");
-		whList.add("who");
-		whList.add("whom");
-		whList.add("when");
-		whList.add("how");
-		whList.add("where");
+		whList.add("什么");
+		whList.add("什么时候");
+		whList.add("哪些");
+		whList.add("哪里");
+		whList.add("谁");
 		
 		// Bad words for NODE. (base form) 
 		// We will train a node recognition model to replace such heuristic rules further.
-		stopNodeList.add("list");
-		stopNodeList.add("give");
-		stopNodeList.add("show");
-		stopNodeList.add("star");
-		stopNodeList.add("theme");
-		stopNodeList.add("world");
-		stopNodeList.add("independence");
-		stopNodeList.add("office");
-		stopNodeList.add("year");
-		stopNodeList.add("work");
-	}
-	
-	public void fixStopWord(QueryLogger qlog, DependencyTree ds)
-	{
-		String qStr = qlog.s.plainText.toLowerCase();
-		
-		//... [which] 
-		for(int i=2;i<qlog.s.words.length;i++)
-			if(qlog.s.words[i].baseForm.equals("which"))
-				stopNodeList.add(qlog.s.words[i].baseForm);
-		
-		//take [place]
-		if(qStr.contains("take place") || qStr.contains("took place"))
-			stopNodeList.add("place");
-		
-		//(When was Alberta admitted) as [province] 
-		if(qStr.contains("as province"))
-			stopNodeList.add("province");
-		
-		//what form of government is found in ...
-		if(qStr.contains("form of government"))
-			stopNodeList.add("government");
-		
-		//alma mater of the chancellor
-		if(qStr.contains("alma mater of the chancellor"))
-		{
-			stopNodeList.add("chancellor");
-		}
-		//How large is the area of UK?
-		if(qStr.contains("the area of") || qStr.contains("how big"))
-		{
-			stopNodeList.add("area");
-		}
-		//how much is the total population of european union?
-		if(qStr.contains("how much"))
-		{
-			stopNodeList.add("population");
-			stopNodeList.add("elevation");
-		}
-		//when was the founding date of french fifth republic
-		if(qStr.contains("when was the"))
-		{
-			stopNodeList.add("founding");
-			stopNodeList.add("date");
-			stopNodeList.add("death");
-			stopNodeList.add("episode");
-		}
-		if(qStr.contains("what other book"))
-		{
-			stopNodeList.add("book");
-		}
-		//Is [Michelle Obama] the [wife] of Barack Obama?
-		if(qlog.s.words[0].baseForm.equals("be") && isNode(ds.getNodeByIndex(2)) && ds.getNodeByIndex(3).dep_father2child.equals("det") 
-				&& isNode(ds.getNodeByIndex(4)) && qlog.s.words[4].baseForm.equals("of"))
-			stopNodeList.add(ds.getNodeByIndex(4).word.baseForm);
+		stopNodeList.add("信仰");
+		stopNodeList.add("人");
 	}
 
-	// Semantic Parsing for DBpedia.
+	// Semantic Parsing for Pkubase.
 	public ArrayList<SemanticUnit> process(QueryLogger qlog)
 	{
 		try 
@@ -135,15 +70,15 @@ public class BuildQueryGraph
  * 3)Coreference resolution.
  * */		
 			//0) Fix stop words
-			fixStopWord(qlog, ds);
+//			fixStopWord(qlog, ds);
 			
 			//1) Detect Modifier/Modified
 			//rely on sentence (rather than dependency tree)
 			//with some ADJUSTMENT (eg, ent+noun(noType&&noEnt) -> noun.omitNode=TRUE)
 			for(Word word: qlog.s.words)
 				getTheModifiedWordBySentence(qlog.s, word);	//Find continuous modifier
-			for(Word word: qlog.s.words)
-				getDiscreteModifiedWordBySentence(qlog.s, word); //Find discrete modifier
+//			for(Word word: qlog.s.words)
+//				getDiscreteModifiedWordBySentence(qlog.s, word); //Find discrete modifier
 			for(Word word: qlog.s.words)
 				if(word.modifiedWord == null)	//Other words modify themselves. NOTICE: only can be called after detecting all modifier.
 					word.modifiedWord = word;
@@ -167,9 +102,9 @@ public class BuildQueryGraph
 			
 			qlog.target = target.word;
 			// !target can NOT be entity. (except general question)| which [city] has most people?
-			if(qlog.s.sentenceType != SentenceType.GeneralQuestion && target.word.emList!=null) 
+			// only when target.mayType=True or exist other entities.
+			if(qlog.s.sentenceType != SentenceType.GeneralQuestion && target.word.mayEnt && target.word.mayType) 
 			{
-				//Counter example：Give me all Seven_Wonders_of_the_Ancient_World | (in fact, it not ENT, but CATEGORY, ?x subject Seve...)
 				target.word.mayEnt = false;
 				target.word.emList.clear();
 			}
@@ -241,6 +176,17 @@ public class BuildQueryGraph
 					curSU.neighborUnitList.add(expandSU);
 				}
 			}
+			if(semanticUnitList.size() == 1 && target.word.mayEnt)
+			{
+				Word[] words = qlog.s.words;
+				SemanticUnit curSU = semanticUnitList.get(0);
+				SemanticUnit expandSU = new SemanticUnit(words[words.length-1], false);
+				semanticUnitList.add(expandSU);
+				curSU.neighborUnitList.add(expandSU);
+				expandSU.neighborUnitList.add(curSU);
+				target = ds.getNodeByIndex(words.length);
+				qlog.target = target.word;
+			}
 			qlog.timeTable.put("BQG_structure", (int)(System.currentTimeMillis()-t));
 			
 			//step2: Find relations (Notice, we regard that the coreference have been resolved now)
@@ -251,7 +197,7 @@ public class BuildQueryGraph
 			qlog.timeTable.put("BQG_relation", (int)(System.currentTimeMillis()-t));
 		
 			//Prepare for item mapping
-			TypeRecognition.AddTypesOfWhwords(qlog.semanticRelations); // Type supplementary
+//			TypeRecognition.AddTypesOfWhwords(qlog.semanticRelations); // Type supplementary
 			TypeRecognition.constantVariableRecognition(qlog.semanticRelations, qlog); // Constant or Variable, embedded triples
 			
 			//(just for display)
@@ -361,7 +307,7 @@ public class BuildQueryGraph
 					tmpRelations = new ArrayList<SimpleRelation>();
 					//Copy relations (for 'and', 'as soon as'...) |eg, In which films did Julia_Roberts and Richard_Gere play?
 					//TODO: judge by dependency tree | other way to supplement relations
-					if(curSU.centerWord.position + 2 == expandSU.centerWord.position && qlog.s.words[curSU.centerWord.position].baseForm.equals("and"))
+					if(curSU.centerWord.position + 2 == expandSU.centerWord.position && qlog.s.words[curSU.centerWord.position].baseForm.equals("和"))
 					{
 						for(SimpleRelation sr: simpleRelations)
 						{
@@ -566,6 +512,7 @@ public class BuildQueryGraph
 		return false;
 	}
 	
+	// detect the target (question focus), also to detect some co-reference via rules. (TODO: test existing utils for co-reference resolution)
 	public DependencyTreeNode detectTarget(DependencyTree ds, QueryLogger qlog)
 	{
 		visited.clear();
@@ -583,8 +530,10 @@ public class BuildQueryGraph
 		// No Wh-Word: use the first node; NOTICE: consider MODIFIER rules. E.g, was us president Obama ..., target=obama (rather us)
 		if(target == null)
 		{
-			for(Word word: words)
+			//Chinese sentence: the question focus is usually in the tail.
+			for(int i=words.length-1; i>=0; i--)
 			{
+				Word word = words[i];
 				Word modifiedWord = word.modifiedWord;
 				if(modifiedWord != null && isNodeCandidate(modifiedWord))
 				{
@@ -594,42 +543,25 @@ public class BuildQueryGraph
 			}
 			
 			if(target == null)
-				target = ds.nodesList.get(0);
-			
-			/* Are [E|tree_frogs] a type of [E|amphibian] , type
-			*/
-			for(DependencyTreeNode dtn: target.childrenList)
-			{
-				if(dtn.word.baseForm.equals("type"))
-				{
-					dtn.word.represent = target.word;
-				}
-			}
-			
+				target = ds.nodesList.get(0);	
 			
 		}
-		//where, NOTICE: wh target from NN may not pass the function isNode()
-		if(target.word.baseForm.equals("where"))
+		//where
+		if(target.word.baseForm.equals("哪里"))
 		{
 			int curPos = target.word.position - 1;
 			
-			//!Where is the residence of
-			if(words[curPos+1].baseForm.equals("be") && words[curPos+2].posTag.equals("DT"))
+			//大兴安岭的[终点]是(哪里)
+			if(curPos-2>=0 && isNodeCandidate(words[curPos-2]) && words[curPos-1].baseForm.equals("是"))
 			{
-				for(int i=curPos+4;i<words.length;i++)
-					if(words[i-1].posTag.startsWith("N") && words[i].posTag.equals("IN"))
-					{
-						target.word.represent = words[i-1];
-						target = ds.getNodeByIndex(i);
-						break;
-					}
-				
+				target.word.represent = words[curPos-1];
+				target = ds.getNodeByIndex(words[curPos-1].position);
 			}
 		}
 		//which
-		if(target.word.baseForm.equals("which"))
+		if(target.word.baseForm.equals("哪些") || target.word.baseForm.equals("哪个"))
 		{
-			// test case: In which US state is Mount_McKinley located
+			// test case: 韩国有哪些著名景点？
 			int curPos = target.word.position-1;
 			if(curPos+1 < words.length)
 			{
@@ -639,27 +571,10 @@ public class BuildQueryGraph
 					// which city ... target = city
 					target.word.represent = word1;
 					target = ds.getNodeByIndex(word1.position);
-					int word1Pos = word1.position - 1;
-					// word1 + be + (the) + word2, and be is root: word1 & word2 may coreference
-					if(ds.root.word.baseForm.equals("be") && word1Pos+3 < words.length && words[word1Pos+1].baseForm.equals("be"))
-					{
-						// which city is [the] headquarters ...
-						Word word2 = words[word1Pos+2].modifiedWord;
-						if(words[word1Pos+2].posTag.equals("DT"))
-							word2 = words[word1Pos+3].modifiedWord;
-						int word2Pos = word2.position - 1;
-						if(word2Pos+1 < words.length && isNodeCandidate(word2) && words[word2Pos+1].posTag.startsWith("IN"))
-						{
-							//In which city is [the] headquarters of ... | target = headquarters, city & headquarters: coreference
-							//In which city was the president of Montenegro born? | COUNTER example, city & president: independent
-							target.word.represent = word2;
-							target = ds.getNodeByIndex(word2.position);
-						}
-					}
 				}
 			}
 			// by dependency tree
-			if(target.word.baseForm.equals("which"))
+			if(target.word.baseForm.equals("哪些") || target.word.baseForm.equals("哪个"))
 			{
 				//Which of <films> had the highest budget
 				boolean ok = false;
@@ -683,14 +598,14 @@ public class BuildQueryGraph
 			
 		}
 		//what
-		else if(target.word.baseForm.equals("what"))
+		else if(target.word.baseForm.equals("什么"))
 		{
-			//Detect：what is [the] sth1 prep. sth2?
+			//Detect：龙卷风的[英文名]是(什么) | 金轮国师的(什么)[武功]有十龙十象之力？
 			//Omit: what is sth? 
 			if(target.father != null && ds.nodesList.size()>=5)
 			{
 				DependencyTreeNode tmp1 = target.father;
-				if(tmp1.word.baseForm.equals("be"))
+				if(tmp1.word.baseForm.equals("是"))
 				{
 					for(DependencyTreeNode child: tmp1.childrenList)
 					{
@@ -698,15 +613,13 @@ public class BuildQueryGraph
 							continue;
 						if(isNode(child))
 						{
-							//sth1
-							boolean hasPrep = false;
+							boolean another_node = false;
 							for(DependencyTreeNode grandson: child.childrenList)
-							{	//prep
-								if(grandson.dep_father2child.equals("prep"))
-									hasPrep = true;
-							}
-							//Detect modifier: what is the sht1's [sth2]? | what is the largest [city]?
-							if(hasPrep || qlog.s.hasModifier(child.word))
+								if(isNode(grandson))
+									another_node = true;
+							
+							//more than 2 nodes || Detect modifier: what is the sht1's [sth2]? | what is the largest [city]?
+							if(another_node || qlog.s.hasModifier(child.word))
 							{
 								target.word.represent = child.word;
 								target = child;
@@ -715,82 +628,84 @@ public class BuildQueryGraph
 						}
 					}
 				}
-				//what sth || What airlines are (part) of the SkyTeam alliance?
+				//what sth: 什么山高于8000米
 				else if(isNode(tmp1))
 				{
 					target.word.represent = tmp1.word;
-					target = tmp1;
-					// Coreference resolution
-					int curPos = target.word.position - 1;
-					if(curPos+3<words.length && words[curPos+1].baseForm.equals("be")&&words[curPos+3].posTag.startsWith("IN") && words.length > 6)
-					{
-						words[curPos+2].represent = target.word;
-					}
-					
+					target = tmp1;					
 				}
 			}
 			// by sentence
-			if(target.word.baseForm.equals("what"))
+			if(target.word.baseForm.equals("什么"))
 			{
+				// 金轮国师的(什么)[武功]有十龙十象之力？
 				int curPos = target.word.position - 1;
-				// what be the [node] ... ? (Notice: words.length CONTAINS symbol(?)，different from nodeList)
-				if(words.length > 5 && words[curPos+1].baseForm.equals("be") && words[curPos+2].baseForm.equals("the") && isNodeCandidate(words[curPos+3]))
+				if(curPos + 1 <= words.length - 1 && isNodeCandidate(words[curPos+1]))
 				{
-					target.word.represent = words[curPos+3];
-					target = ds.getNodeByIndex(words[curPos+3].position);
+					target.word.represent = words[curPos+1];
+					target = ds.getNodeByIndex(words[curPos+1].position);
 				}
 			}
 			
 		}
 		//who
-		else if(target.word.baseForm.equals("who"))
+		else if(target.word.baseForm.equals("谁"))
 		{
-			//Detect：who is/does [the] sth1 prep. sth2?  || Who was the pope that founded the Vatican_Television ? | Who does the voice of Bart Simpson?
+			//Detect：武汉大学的现任[校长]是(谁)？	和子女一起演过电影电视剧的[演员]有(谁)？
 			//Others: who is sth? who do sth?  | target = who
-			//test case: Who is the daughter of Robert_Kennedy married to?
-			if(ds.nodesList.size()>=5)
-			{	//who
-				for(DependencyTreeNode tmp1: ds.nodesList)
-				{
-					if(tmp1 != target.father && !target.childrenList.contains(tmp1))
-						continue;
-					if(tmp1.word.baseForm.equals("be") || tmp1.word.baseForm.equals("do"))
-					{	//is
-						for(DependencyTreeNode child: tmp1.childrenList)
-						{
-							if(child == target)
-								continue;
-							if(isNode(child))
-							{	//sth1
-								boolean hasPrep = false;
-								for(DependencyTreeNode grandson: child.childrenList)
-								{	//prep
-									if(grandson.dep_father2child.equals("prep"))
-										hasPrep = true;
-								}
-								//Detect modifier: who is the sht1's sth2?
-//								if(hasPrep || qlog.s.plainText.contains(child.word.originalForm + " 's")) // replaced by detect modifier directly
-								if(hasPrep || qlog.s.hasModifier(child.word))
-								{
-									target.word.represent = child.word;
-									target = child;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
+			//test case: 湖上草是[谁]的(诗)？
+//			if(ds.nodesList.size()>=5)
+//			{	//who
+//				for(DependencyTreeNode tmp1: ds.nodesList)
+//				{
+//					if(tmp1 != target.father && !target.childrenList.contains(tmp1))
+//						continue;
+//					if(tmp1.word.baseForm.equals("be") || tmp1.word.baseForm.equals("do"))
+//					{	//is
+//						for(DependencyTreeNode child: tmp1.childrenList)
+//						{
+//							if(child == target)
+//								continue;
+//							if(isNode(child))
+//							{	//sth1
+//								boolean hasPrep = false;
+//								for(DependencyTreeNode grandson: child.childrenList)
+//								{	//prep
+//									if(grandson.dep_father2child.equals("prep"))
+//										hasPrep = true;
+//								}
+//								//Detect modifier: who is the sht1's sth2?if(hasPrep || qlog.s.hasModifier(child.word))
+//								{
+//									target.word.represent = child.word;
+//									target = child;
+//									break;
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
 			// by sentence
-			if(target.word.baseForm.equals("who"))
+			if(target.word.baseForm.equals("谁"))
 			{
 				int curPos = target.word.position - 1;
-				// who is usually coreference when it not the first word. 
-				if(curPos - 1 >= 0 && isNodeCandidate(words[curPos-1]))
+				// [Node]是(谁)
+				if(curPos - 2 >= 0 && isNodeCandidate(words[curPos-2]))
 				{
-					target.word.represent = words[curPos-1];
-					target = ds.getNodeByIndex(words[curPos-1].position);
+					// 谁 在末尾: 武汉大学的现任[校长]是(谁)
+					if(curPos == words.length - 1 && (words[curPos-1].baseForm.equals("是") || words[curPos-1].baseForm.equals("有")) )
+					{
+						target.word.represent = words[curPos-2];
+						target = ds.getNodeByIndex(words[curPos-2].position);
+					}
+					// [湖上草]是谁的(诗)
+					if(curPos + 2 == words.length-1 && words[curPos-1].baseForm.equals("是") 
+							&& words[curPos+1].baseForm.equals("的") && isNodeCandidate(words[curPos+2]))
+					{
+						words[curPos+2].represent = words[curPos-2];
+					}
 				}
+				// Do nothing: [谁]的[女儿]嫁给了王思聪
 			}
 		}
 		//how
@@ -847,7 +762,7 @@ public class BuildQueryGraph
 	/*
 	 * There are two cases of [ent]+[type]：1、Chinese company 2、De_Beer company; 
 	 * For 1, chinese -> company，for 2, De_Beer <- company
-	 * Return: True : ent -> type | False ： type <- ent
+	 * Return: True : ent -> type | False ： ent <- type
 	 * */
 	public boolean checkModifyBetweenEntType(Word entWord, Word typeWord)
 	{
@@ -868,9 +783,9 @@ public class BuildQueryGraph
 	 * Trough sentence rather than dependency tree as the latter often incorrect 
 	 * Generally a sequencial nodes always modify the last node, an exception is test case 3. So we apply recursive search method.
 	 * test case:
-	 * 1) the highest Chinese mountain
-	 * 2) the Chinese popular director
-	 * 3) the De_Beers company  (company[type]-> De_Beers[ent])
+	 * 1) 最高的中国山峰
+	 * 2) 中国流行歌手
+	 * 3) 谷歌公司  (company[type]-> De_Beers[ent])
 	 * */
 	public Word getTheModifiedWordBySentence(Sentence s, Word curWord)
 	{
@@ -898,14 +813,14 @@ public class BuildQueryGraph
 				return curWord.modifiedWord = curWord;
 		}
 		
-		//modify LEFT: ent + type(cur) : De_Beer company
+		//modify LEFT: ent + type(cur) : 谷歌 公司
 		if(preWord != null && curWord.mayType && preWord.mayEnt) //ent + type(cur)
 		{
 			if(!checkModifyBetweenEntType(preWord, curWord)) //De_Beer <- company, 注意此时即使type后面还连着node，也不理会了
 				return curWord.modifiedWord = preWord;
 		}
 		
-		//modify itself: ent(cur) + type : De_Beer company
+		//modify itself: ent(cur) + type : 谷歌 公司
 		if(nextModifiedWord != null && curWord.mayEnt && nextModifiedWord.mayType)
 		{
 			if(!checkModifyBetweenEntType(curWord, nextModifiedWord))

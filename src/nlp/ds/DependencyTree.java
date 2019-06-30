@@ -6,75 +6,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import nlp.tool.CoreNLP;
-import nlp.tool.MaltParser;
 import nlp.tool.StanfordParser;
-
-import org.maltparser.core.exception.MaltChainedException;
-import org.maltparser.core.syntaxgraph.DependencyStructure;
-import org.maltparser.core.syntaxgraph.node.DependencyNode;
-
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.IndexedWord;
+import edu.stanford.nlp.ling.SentenceUtils;
 import edu.stanford.nlp.trees.GrammaticalStructure;
 import edu.stanford.nlp.trees.TypedDependency;
-import edu.stanford.nlp.trees.semgraph.SemanticGraph;
 
 public class DependencyTree {
 	public DependencyTreeNode root = null;
 	public ArrayList<DependencyTreeNode> nodesList = null;
 	
-	public SemanticGraph dependencies = null;	// Method 1: CoreNLP (discarded)
-	public GrammaticalStructure gs = null;		// Method 2: Stanford Parser
-	public DependencyStructure maltGraph = null;	// Method 3: MaltParser
+//	public GrammaticalStructure gs = null;		// Method 2: Stanford Parser
 	
 	public HashMap<String, ArrayList<DependencyTreeNode>> wordBaseFormIndex = null;
 	
-	public DependencyTree (Sentence sentence, CoreNLP coreNLPparser) {
-		SemanticGraph dependencies = coreNLPparser.getBasicDependencies(sentence.plainText);
-		this.dependencies = dependencies;
-		
-		Stack<IndexedWord> stack = new Stack<IndexedWord>();
-		IndexedWord iwRoot = dependencies.getFirstRoot();
-		
-		HashMap<IndexedWord, DependencyTreeNode> map = new HashMap<IndexedWord, DependencyTreeNode>();
-		nodesList = new ArrayList<DependencyTreeNode>();
-
-		stack.push(iwRoot);
-		root = this.setRoot(sentence.getWordByIndex(iwRoot.index()));
-		map.put(iwRoot, root);
-
-		while (!stack.empty())
-		{
-			IndexedWord curIWNode = stack.pop();
-			DependencyTreeNode curDTNode = map.get(curIWNode);
-			
-			for (IndexedWord iwChild : dependencies.getChildList(curIWNode)) {
-				Word w = sentence.getWordByIndex(iwChild.index());
-				DependencyTreeNode newDTNode = this.insert(
-						curDTNode, 
-						w, 
-						dependencies.reln(curIWNode, iwChild).getShortName());
-				map.put(iwChild, newDTNode);
-				stack.push(iwChild);
-			}
-			
-			curDTNode.sortChildrenList();
-			nodesList.add(curDTNode);
-		}
-	}
-	
 	public DependencyTree (Sentence sentence, StanfordParser stanfordParser) {
-		this.gs = stanfordParser.getGrammaticalStructure(sentence.plainText);
-		
+	
 		HashMap<Integer, DependencyTreeNode> map = new HashMap<Integer, DependencyTreeNode>();
 		nodesList = new ArrayList<DependencyTreeNode>();
 		
-		List<TypedDependency> tdl = gs.typedDependencies(false);
+//	    String[] sent = { "这", "是", "一个", "简单", "的", "句子", "。" };
+	    String[] sent = sentence.getWordsArr();
+	    List<CoreLabel> rawWords = SentenceUtils.toCoreLabelList(sent);
+		List<TypedDependency> tdl = stanfordParser.getTypedDependencyList(rawWords);
+		
 		// 1. generate all nodes.
 	    for (TypedDependency td : tdl) {
 	    	// gov
 	    	if (!map.containsKey(td.gov().index()) && !td.reln().getShortName().equals("root")) {
 	    		Word w = sentence.getWordByIndex(td.gov().index());
+	    		w.posTag = td.gov().tag();	// POS TAG
 	    		DependencyTreeNode newNode = new DependencyTreeNode(w);
 	    		map.put(td.gov().index(), newNode);
 	    		nodesList.add(newNode);
@@ -82,6 +44,7 @@ public class DependencyTree {
 	    	// dep
 	    	if (!map.containsKey(td.dep().index())) {
 	    		Word w = sentence.getWordByIndex(td.dep().index());
+	    		w.posTag = td.dep().tag(); // POS TAG
 	    		DependencyTreeNode newNode = new DependencyTreeNode(w);
 	    		map.put(td.dep().index(), newNode);
 	    		nodesList.add(newNode);    		
@@ -118,139 +81,9 @@ public class DependencyTree {
 	    	}
 	    }
 	    Collections.sort(nodesList, new DependencyTreeNodeComparator()); 
-	    for (DependencyTreeNode dtn : nodesList) {
-	    	dtn.linkNN(this);
-	    }
-	}
-	
-	public DependencyTree (Sentence sentence, MaltParser maltParser)throws MaltChainedException {
-		try {
-			// the tokens are parsed in the following line
-			DependencyStructure graph = maltParser.getDependencyStructure(sentence);
-			this.maltGraph = graph;
-			//System.out.println(graph);
-			
-			HashMap<Integer, DependencyTreeNode> map = new HashMap<Integer, DependencyTreeNode>();
-			ArrayList<DependencyTreeNode> list = new ArrayList<DependencyTreeNode>();
-			Stack<DependencyNode> stack = new Stack<DependencyNode>();
-			DependencyNode nroot = graph.getDependencyRoot();
-			stack.add(nroot);
-			// 1. generate all nodes.
-			while (!stack.isEmpty()) {
-				DependencyNode n = stack.pop();
-				DependencyNode sib = n.getRightmostDependent();
-				int key = n.getIndex();
-				//System.out.println("[current node][key="+key+"] "+n+" <"+n.getHeadEdge()+">");
-				boolean flag = true;
-				while (sib != null) {
-					flag = false;
-					stack.push(sib);
-					sib = sib.getLeftSibling();
-				}
-				if (flag) {
-					sib = n.getLeftmostDependent();
-					while (sib != null) {
-						stack.push(sib);
-						sib = sib.getRightSibling();
-					}
-				}
-				if (n.hasHead() && !map.containsKey(key)) {
-					//String snode = n.toString(); 
-					String sedge = n.getHeadEdge().toString();
-					//System.out.println("[" + snode + "]  <" + sedge + ">");
-
-					/*int position = 0;
-					String wordOriginal = null;
-					String wordBase;
-					String postag = null;*/
-					String dep = null;					
-					int idx1, idx2;
-					
-					/*// position
-					idx1 = snode.indexOf("ID:")+3;
-					idx2 = snode.indexOf(' ', idx1);
-					position = Integer.parseInt(snode.substring(idx1, idx2));
-					
-					// word
-					idx1 = snode.indexOf("FORM:", idx2)+5;
-					idx2 = snode.indexOf(' ', idx1);
-					wordOriginal = snode.substring(idx1, idx2);
-					wordBase = Globals.coreNLP.getBaseFormOfPattern(wordOriginal.toLowerCase());
-					
-					// postag
-					idx1 = snode.indexOf("POSTAG:", idx2)+7;
-					idx2 = snode.indexOf(' ', idx1);
-					postag = snode.substring(idx1, idx2);*/
-					
-					// dep
-					idx1 = sedge.lastIndexOf(':')+1;
-					idx2 = sedge.lastIndexOf(' ');
-					dep = sedge.substring(idx1, idx2);
-					if (dep.equals("null")) {
-						dep = null;
-					}
-					else if (dep.equals("punct")) {// No consider about punctuation
-						continue;
-					}
-					
-		    		DependencyTreeNode newNode = new DependencyTreeNode(sentence.getWordByIndex(key));
-		    		newNode.dep_father2child = dep;
-		    		map.put(key, newNode);
-		    		list.add(newNode);
-				}
-			}
-			
-			
-		    // 2. add edges
-		    for (Integer k : map.keySet()) {
-		    	DependencyNode n = graph.getDependencyNode(k);
-		    	DependencyTreeNode dtn = map.get(k);
-		    	if (dtn.dep_father2child == null) {
-		    		this.setRoot(dtn);
-		    		this.root.levelInTree = 0;
-		    		this.root.dep_father2child = "root";
-		    	}
-		    	else {
-			    	DependencyTreeNode father = map.get(n.getHead().getIndex());
-			    	DependencyTreeNode child = map.get(n.getIndex());
-			    	child.father = father;
-			    	father.childrenList.add(child);
-		    	}
-		    }
-		    
-		    // Fix the tree for some cases.
-		    if(list.size() > 11)
-		    {
-		    	DependencyTreeNode dt1 = list.get(11), dt2 = list.get(5);
-		    	if(dt1!=null && dt2!=null && dt1.word.baseForm.equals("star") && dt1.father.word.baseForm.equals("be"))
-		    	{
-	    			if (dt2.word.baseForm.equals("film") || dt2.word.baseForm.equals("movie")) 
-	    			{
-	    				dt1.father.childrenList.remove(dt1);
-	    				dt1.father = dt2;
-	    				dt2.childrenList.add(dt1);
-	    			}
-		    	}
-		    }
-		    
-		    // add levelInTree, sort childrenList & nodesList
-		    for (DependencyTreeNode dtn : list) {
-		    	if (dtn.father != null) {	    	
-			    	dtn.levelInTree = dtn.father.levelInTree + 1;
-			    	dtn.sortChildrenList();
-		    	}		    	
-		    }
-		    
-		    nodesList = list;
-		    Collections.sort(nodesList, new DependencyTreeNodeComparator());	
-		    for (DependencyTreeNode dtn : nodesList) {
-		    	dtn.linkNN(this);
-		    }
-		} catch (MaltChainedException e) {
-			//e.printStackTrace();
-			//System.err.println("MaltParser exception: " + e.getMessage());
-			throw e;
-		}
+//	    for (DependencyTreeNode dtn : nodesList) {
+//	    	dtn.linkNN(this);
+//	    }
 	}
 	
 	public DependencyTreeNode setRoot(Word w) {

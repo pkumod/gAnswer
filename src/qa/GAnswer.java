@@ -32,8 +32,8 @@ public class GAnswer {
 		QueryLogger qlog = null;
 		try 
 		{
-			if (input.length() <= 5)
-				return null;
+//			if (input.length() <= 5)
+//				return null;
 			
 			System.out.println("[Input:] "+input);
 			
@@ -47,17 +47,17 @@ public class GAnswer {
 			
 			// Try to solve each NR plan, and combine the ranked SPARQLs.
 			// We only reserve LOG of BEST NR plan for convenience.
+			// Now only 1 plan
 			for(int i=query.sList.size()-1; i>=0; i--)
 			{
 				Sentence possibleSentence = query.sList.get(i);
 				qlog.reloadSentence(possibleSentence);
-//				qlog.isMaltParserUsed = true;
 				
 				// LOG
 				System.out.println("transQ: "+qlog.s.plainText);
-				qlog.NRlog = query.preLog;
+//				qlog.NRlog = query.preLog;
 				qlog.SQGlog = "Id: "+query.queryId+"\nQuery: "+query.NLQuestion+"\n";
-				qlog.SQGlog += qlog.NRlog;
+//				qlog.SQGlog += qlog.NRlog;
 				qlog.timeTable.put("step0", (int)NRtime);
 				
 				// step 1: question parsing (dependency tree, sentence type)
@@ -91,7 +91,7 @@ public class GAnswer {
 			qlog.rankedSparqls = rankedSparqls;
 			System.out.println("number of rankedSparqls = " + qlog.rankedSparqls.size());
 			
-			// Detect question focus.
+			// Detect question focus. TODO: in which cases the question focus != target?
 			for (int i=0; i<qlog.rankedSparqls.size(); i++) 
 			{
 				// First detect by SPARQLs.
@@ -156,7 +156,7 @@ public class GAnswer {
 	{
 		// modified by Lin Yinnian using ghttp - 2018-9-28
 		GstoreConnector gc = new GstoreConnector(Globals.QueryEngineIP, Globals.QueryEnginePort);
-        String answer = gc.query("root", "123456", "dbpedia16", spq.toStringForGStore2());
+        String answer = gc.query("endpoint", "123", "pkubase", spq.toStringForGStore2());
         System.out.println(answer);
 		String[] rawLines = answer.split("\n");
 		
@@ -199,9 +199,13 @@ public class GAnswer {
 		int i =1;
 		
 		//file in/output
-		List<String> inputList = FileUtil.readFile("E:/Linyinnian/qald6_special.txt");
+		List<String> inputList = FileUtil.readFile("data/test/mini-ccks.txt");
 		for(String input: inputList) 
 		{	
+			if (input.length()<2 || input.charAt(0)!='q') continue;
+			System.out.println("----------------------------------------");
+			System.out.println(input);
+			
 			ArrayList<String> outputs = new ArrayList<String>();
 			ArrayList<String> spqs = new ArrayList<String>(); 
 			spqs.add("id:"+String.valueOf(i));
@@ -220,9 +224,9 @@ public class GAnswer {
 			System.out.println("Ranked Sparqls: " + qlog.rankedSparqls.size());
 			
 			outputs.add(qlog.SQGlog);
-			outputs.add(qlog.SQGlog + "Building HQG time: "+ (qlog.timeTable.get("step0")+qlog.timeTable.get("step1")+qlog.timeTable.get("step2")-qlog.timeTable.get("BQG_topkjoin")) + "ms");
-			outputs.add("TopKjoin time: "+ qlog.timeTable.get("BQG_topkjoin") + "ms");
-			outputs.add("Question Understanding time: "+ (int)(parsing_ed_time - parsing_st_time)+ "ms");
+//			outputs.add(qlog.SQGlog + "Building HQG time: "+ (qlog.timeTable.get("step0")+qlog.timeTable.get("step1")+qlog.timeTable.get("step2")-qlog.timeTable.get("BQG_topkjoin")) + "ms");
+//			outputs.add("TopKjoin time: "+ qlog.timeTable.get("BQG_topkjoin") + "ms");
+//			outputs.add("Question Understanding time: "+ (int)(parsing_ed_time - parsing_st_time)+ "ms");
 			
 			long excuting_st_time = System.currentTimeMillis();
 			Matches m = null;
@@ -274,8 +278,10 @@ public class GAnswer {
 						outputs.add("[" + Math.min(MAX_SPQ_NUM+1, idx) + "]" + "score=" + 1000 + "\n" + stdSPQwoPrefix + "\n");
 				}
 			}
+			else
+				outputs.add("");
 			
-			FileUtil.writeFile(outputs, "E:/Linyinnian/qald6_special_out.txt", true);
+			FileUtil.writeFile(outputs, "data/test/mini-ccks.out", true);
 		}
 			
 	}

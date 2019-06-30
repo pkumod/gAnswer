@@ -19,8 +19,6 @@ public class TypeFragment extends Fragment {
 	public static HashMap<Integer, String> typeId2ShortName = null;
 	public static final int NO_RELATION = -24232;
 	
-	public static HashSet<String> yagoTypeList = null;
-	
 	public HashSet<Integer> inEdges = new HashSet<Integer>();
 	public HashSet<Integer> outEdges = new HashSet<Integer>();
 	public HashSet<Integer> entSet = new HashSet<Integer>();
@@ -33,26 +31,6 @@ public class TypeFragment extends Fragment {
 	 * 4, others: peace、vice
 	 */
 	public static ArrayList<String> stopYagoTypeList = null;
-	static void loadStopYagoTypeList()
-	{
-		stopYagoTypeList = new ArrayList<String>();
-		stopYagoTypeList.add("Amazon");
-		stopYagoTypeList.add("Earth");
-		stopYagoTypeList.add("TheHungerGames");
-		stopYagoTypeList.add("SparklingWine");
-		stopYagoTypeList.add("Type");
-		stopYagoTypeList.add("Flow");
-		stopYagoTypeList.add("Owner");
-		stopYagoTypeList.add("Series");
-		stopYagoTypeList.add("Shot");
-		stopYagoTypeList.add("Part");
-		stopYagoTypeList.add("Care");
-		stopYagoTypeList.add("Peace");
-		stopYagoTypeList.add("Vice");
-		stopYagoTypeList.add("Dodo");
-		stopYagoTypeList.add("CzechFilms");
-		stopYagoTypeList.add("ChineseFilms");
-	}
 	
 	public TypeFragment(String fgmt, int fid) 
 	{
@@ -100,7 +78,7 @@ public class TypeFragment extends Fragment {
 	
 	public static void load() throws Exception 
 	{	
-		String filename = Globals.localPath+"data/DBpedia2016/fragments/class_RDF_fragment/16type_fragment.txt"; 
+		String filename = Globals.localPath+"data/pkubase/fragments/pkubase_type_fragment.txt"; 
 		
 		File file = new File(filename);
 		InputStreamReader in = new InputStreamReader(new FileInputStream(file),"utf-8");
@@ -128,14 +106,13 @@ public class TypeFragment extends Fragment {
 		// can fix some data there
 		// load Type Id
 		loadId();
-		System.out.println("Load "+typeId2ShortName.size()+" basic types and "+yagoTypeList.size()+" yago types.");
+		System.out.println("Load "+typeId2ShortName.size()+" basic types.");
 	}
 	
 	public static void loadId() throws IOException 
 	{
-		String filename = Globals.localPath+"data/DBpedia2016/fragments/id_mappings/16basic_types_id.txt";
-		String yagoFileName = Globals.localPath+"data/DBpedia2016/fragments/id_mappings/16yago_types_list.txt";
-
+		String filename = Globals.localPath+"data/pkubase/fragments/id_mappings/pkubase_type_id.txt";
+		
 		File file = new File(filename);
 		InputStreamReader in = new InputStreamReader(new FileInputStream(file),"utf-8");
 		BufferedReader br = new BufferedReader(in);
@@ -161,19 +138,5 @@ public class TypeFragment extends Fragment {
 		typeId2ShortName.put(RelationFragment.literalTypeId, "literal_HRZ");
 		
 		br.close();
-		
-		//load YAGO types
-		in = new InputStreamReader(new FileInputStream(yagoFileName),"utf-8");
-		br = new BufferedReader(in);
-		yagoTypeList = new HashSet<String>();
-		while((line = br.readLine())!=null)
-		{
-			String[] lines = line.split("\t");
-			String typeName = lines[0];
-			yagoTypeList.add(typeName);
-		}
-		
-		loadStopYagoTypeList();
-		yagoTypeList.removeAll(stopYagoTypeList);
 	}
 }

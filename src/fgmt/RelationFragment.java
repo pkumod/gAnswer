@@ -46,7 +46,9 @@ public class RelationFragment extends Fragment
 	
 	public static void load() throws Exception 
 	{		
-		String filename = Globals.localPath + "data/DBpedia2016/fragments/predicate_RDF_fragment/predicate_fragment.txt"; 
+		System.out.println("Loading relation IDs and Fragments ...");
+		
+		String filename = Globals.localPath + "data/pkubase/fragments/pkubase_predicate_fragment.txt"; 
 		List<String> inputs = FileUtil.readFile(filename);
 		relFragments = new HashMap<Integer, ArrayList<RelationFragment>>();
 		literalRelationSet = new HashSet<Integer>();
@@ -72,7 +74,7 @@ public class RelationFragment extends Fragment
 	
 	public static void loadId() throws IOException 
 	{
-		String filename = Globals.localPath + "data/DBpedia2016/fragments/id_mappings/16predicate_id.txt";
+		String filename = Globals.localPath + "data/pkubase/fragments/id_mappings/pkubase_predicate_id.txt";
 		List<String> inputs = FileUtil.readFile(filename);
 		relationShortName2IdList = new HashMap<String, ArrayList<Integer>>();
 

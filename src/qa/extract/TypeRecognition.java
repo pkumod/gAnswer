@@ -90,15 +90,7 @@ public class TypeRecognition {
 		if(allUpperFormWord.length() > 1 && allUpperFormWord.substring(1).equals(allUpperFormWord.substring(1).toLowerCase()))
 			return null;
 		
-		//search in YAGO type
-		if(TypeFragment.yagoTypeList.contains(allUpperFormWord))
-		{
-			//YAGO prefix
-			String typeName = "yago:"+allUpperFormWord;
-			TypeMapping tm = new TypeMapping(-1,typeName,Globals.pd.typePredicateID,1);
-			tmList.add(tm);
-		}
-		else if(extendTypeMap.containsKey(allUpperFormWord))
+		if(extendTypeMap.containsKey(allUpperFormWord))
 		{
 			String typeName = extendTypeMap.get(allUpperFormWord);
 			TypeMapping tm = new TypeMapping(-1,typeName,Globals.pd.typePredicateID,1);
@@ -251,22 +243,22 @@ public class TypeRecognition {
 				}
 			}
 			// type
-			else if(sr.arg1Word.mayType)
+			else if(sr.arg1Word.mayType) //TODO: type
 			{
 				//rule in/of [type] -> constant  |eg, How many [countries] are there in [exT:Europe] -> ?uri rdf:type yago:EuropeanCountries
-				if(arg1WordPos >= 2 && (words[arg1WordPos-1].baseForm.equals("in") || words[arg1WordPos-1].baseForm.equals("of"))  
-						&& !words[arg1WordPos-2].posTag.startsWith("V"))
-				{
-					sr.isArg1Constant = true;
-					double largerScore = 1000;
-					if(sr.predicateMappings!=null && sr.predicateMappings.size()>0)
-						largerScore = sr.predicateMappings.get(0).score * 2;
-					PredicateMapping nPredicate = new PredicateMapping(Globals.pd.typePredicateID, largerScore, "[type]");
-					sr.predicateMappings.add(0,nPredicate);
-					
-					//constant type should be object
-					sr.preferredSubj = sr.arg2Word;
-				}
+//				if(arg1WordPos >= 2 && (words[arg1WordPos-1].baseForm.equals("in") || words[arg1WordPos-1].baseForm.equals("of"))  
+//						&& !words[arg1WordPos-2].posTag.startsWith("V"))
+//				{
+//					sr.isArg1Constant = true;
+//					double largerScore = 1000;
+//					if(sr.predicateMappings!=null && sr.predicateMappings.size()>0)
+//						largerScore = sr.predicateMappings.get(0).score * 2;
+//					PredicateMapping nPredicate = new PredicateMapping(Globals.pd.typePredicateID, largerScore, "[type]");
+//					sr.predicateMappings.add(0,nPredicate);
+//					
+//					//constant type should be object
+//					sr.preferredSubj = sr.arg2Word;
+//				}
 			}
 			//ent: constant
 			else if(sr.arg1Word.mayEnt)
@@ -297,37 +289,37 @@ public class TypeRecognition {
 			else if(sr.arg2Word.mayType)
 			{
 				//rule in/of [type] -> constant  |eg, How many [countries] are there in [exT:Europe] -> ?uri rdf:type yago:EuropeanCountries
-				if(arg2WordPos >= 2 && (words[arg2WordPos-1].baseForm.equals("in") || words[arg2WordPos-1].baseForm.equals("of")) 
-						&& !words[arg2WordPos-2].posTag.startsWith("V") )
-				{
-					sr.isArg2Constant = true;
-					double largerScore = 1000;
-					if(sr.predicateMappings!=null && sr.predicateMappings.size()>0)
-						largerScore = sr.predicateMappings.get(0).score * 2;
-					PredicateMapping nPredicate = new PredicateMapping(Globals.pd.typePredicateID, largerScore, "[type]");
-					sr.predicateMappings.add(0,nPredicate);
-					
-					sr.preferredSubj = sr.arg1Word;
-				}
+//				if(arg2WordPos >= 2 && (words[arg2WordPos-1].baseForm.equals("in") || words[arg2WordPos-1].baseForm.equals("of")) 
+//						&& !words[arg2WordPos-2].posTag.startsWith("V") )
+//				{
+//					sr.isArg2Constant = true;
+//					double largerScore = 1000;
+//					if(sr.predicateMappings!=null && sr.predicateMappings.size()>0)
+//						largerScore = sr.predicateMappings.get(0).score * 2;
+//					PredicateMapping nPredicate = new PredicateMapping(Globals.pd.typePredicateID, largerScore, "[type]");
+//					sr.predicateMappings.add(0,nPredicate);
+//					
+//					sr.preferredSubj = sr.arg1Word;
+//				}
 				//rule: Be ... a type?
-				if(words[0].baseForm.equals("be") && arg2WordPos >=3 && words[arg2WordPos-1].baseForm.equals("a"))
-				{
-					sr.isArg2Constant = true;
-					double largerScore = 1000;
-					if(sr.predicateMappings!=null && sr.predicateMappings.size()>0)
-						largerScore = sr.predicateMappings.get(0).score * 2;
-					PredicateMapping nPredicate = new PredicateMapping(Globals.pd.typePredicateID, largerScore, "[type]");
-					sr.predicateMappings.add(0,nPredicate);
-					
-					sr.preferredSubj = sr.arg1Word;
-				}
+//				if(words[0].baseForm.equals("be") && arg2WordPos >=3 && words[arg2WordPos-1].baseForm.equals("a"))
+//				{
+//					sr.isArg2Constant = true;
+//					double largerScore = 1000;
+//					if(sr.predicateMappings!=null && sr.predicateMappings.size()>0)
+//						largerScore = sr.predicateMappings.get(0).score * 2;
+//					PredicateMapping nPredicate = new PredicateMapping(Globals.pd.typePredicateID, largerScore, "[type]");
+//					sr.predicateMappings.add(0,nPredicate);
+//					
+//					sr.preferredSubj = sr.arg1Word;
+//				}
 			}
 			else if(sr.arg2Word.mayEnt)
 			{
 				sr.isArg2Constant = true;
 			}
 			
-			if(sr.arg1Word != sr.preferredSubj)
+			if(sr.arg2Word == sr.preferredSubj)
 				sr.swapArg1Arg2();
 		}
 	}

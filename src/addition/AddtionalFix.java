@@ -20,16 +20,10 @@ public class AddtionalFix
 	
 	public AddtionalFix()
 	{
-		// Some category mappings for DBpedia, try automatic linking methods later. | base form
-		pattern2category.put("gangster_from_the_prohibition_era", "Prohibition-era_gangsters");
-		pattern2category.put("seven_wonder_of_the_ancient_world", "Seven_Wonders_of_the_Ancient_World");
-		pattern2category.put("three_ship_use_by_columbus", "Christopher_Columbus");
-		pattern2category.put("13_british_colony", "Thirteen_Colonies");
 	}
 	
 	public void process(QueryLogger qlog)
 	{
-		fixCategory(qlog);
 		oneTriple(qlog);
 		oneNode(qlog);
 		
@@ -48,45 +42,10 @@ public class AddtionalFix
 				spq.queryType = QueryType.Ask;
 	}
 	
-	public void fixCategory(QueryLogger qlog)
-	{
-		if(qlog == null || qlog.semanticUnitList == null)
-			return;
-		
-		String var = null, category = null;
-		for(SemanticUnit su: qlog.semanticUnitList)
-		{
-			if(su.centerWord.mayCategory)
-			{
-				var = "?"+su.centerWord.originalForm;
-				category = su.centerWord.category;
-			}
-		}
-		
-		if(category != null && var != null)
-			for(Sparql spq: qlog.rankedSparqls)
-			{
-				boolean occured = false;
-				for(Triple tri: spq.tripleList)
-				{
-					if(tri.subject.equals(var))
-					{
-						occured = true;
-						break;
-					}
-				}
-				String oName = category;
-				String pName = "subject";
-				int pid = Globals.pd.predicate_2_id.get(pName);
-				Triple triple =	new Triple(Triple.VAR_ROLE_ID, var, pid, Triple.CAT_ROLE_ID, oName, null, 100);
-				spq.addTriple(triple);
-			}
-	}
-	
 	/* recognize one-Node query 
 	 * Two cases：1、Special question|Imperative sentence	2、General question
 	 * 1-1：how many [], highest [] ...  | For single variable, add constraint (aggregation)
-	 * 1-2: What is backgammon? | What is a bipolar syndrome? | Search an entity (return itself or its type/description ...)
+	 * 1-2: 谁是狄仁杰? | What is a bipolar syndrome? | Search an entity (return itself or its type/description ...)
 	 * 1-3: Give me all Seven Wonders of the Ancient World. | Notice, "Seven Wonders of the Ancient World" should be recognized as ENT before. (in fact it is CATEGORY in DBpeida)
  	 * 2-1: Are there any [castles_in_the_United_States](yago:type)
  	 * 2-2：Was Sigmund Freud married? | Lack of variable node.
@@ -101,7 +60,7 @@ public class AddtionalFix
 		Word[] words = qlog.s.words;
 		if(qlog.s.sentenceType != SentenceType.GeneralQuestion)
 		{
-			//1-1: how many [type] are there | List all [type]
+			//1-1: 有多少[type] | 列出所有[type]
 			if(target.mayType && target.tmList != null)
 			{
 				String subName = "?"+target.originalForm;
@@ -111,10 +70,10 @@ public class AddtionalFix
 				sparql.addTriple(triple);
 				qlog.rankedSparqls.add(sparql);
 			}
-			//1-2: What is [ent]?
 			else if(target.mayEnt && target.emList != null)
 			{
-				if(words.length >= 3 && words[0].baseForm.equals("what") && words[1].baseForm.equals("be"))
+				//1-2: 什么是[ent]
+				if(words.length >= 3 && (words[0].baseForm.equals("什么") || words[0].baseForm.equals("谁")) && words[1].baseForm.equals("是"))
 				{
 					int eid = target.emList.get(0).entityID;
 					String subName = target.emList.get(0).entityName;
@@ -123,24 +82,14 @@ public class AddtionalFix
 					sparql.addTriple(triple);
 					qlog.rankedSparqls.add(sparql);
 				}
-			}
-			//1-3: Give me all Seven Wonders of the Ancient World.
-			else if(target.mayCategory && target.category != null)
-			{
-				String oName = target.category;
-				String pName = "subject";
-				int pid = Globals.pd.predicate_2_id.get(pName);
-				Triple triple =	new Triple(Triple.VAR_ROLE_ID, "?"+target.originalForm, pid, Triple.CAT_ROLE_ID, oName, null, 100);
-				Sparql sparql = new Sparql();
-				sparql.addTriple(triple);
-				qlog.rankedSparqls.add(sparql);
+				//1-3: [ent] with other relations
 			}
 		}
-		else 
+		else
 		{
 			if(target.mayEnt && target.emList != null)
 			{
-				//2-2：Was Sigmund Freud married?
+				//2-2：[ent]结婚了吗？
 				String relMention = "";
 				for(Word word: words)
 					if(word != target && !word.baseForm.equals(".") && !word.baseForm.equals("?"))
@@ -162,34 +111,6 @@ public class AddtionalFix
 					sparql.addTriple(triple);
 					qlog.rankedSparqls.add(sparql);
 				}
-		
-				//2-3：Are penguins endangered?
-				else
-				{
-					if(target.position < words.length && pattern2category.containsKey(words[target.position].baseForm))
-					{
-						String oName = pattern2category.get(words[target.position].baseForm);
-						String pName = "subject";
-						int pid = Globals.pd.predicate_2_id.get(pName);
-						int eid = target.emList.get(0).entityID;
-						String subName = target.emList.get(0).entityName;
-						Triple triple =	new Triple(eid, subName, pid, Triple.CAT_ROLE_ID, oName, null, 100);
-						Sparql sparql = new Sparql();
-						sparql.addTriple(triple);
-						qlog.rankedSparqls.add(sparql);
-					}
-				}
-			}
-			//2-1: Are there any [castles_in_the_United_States](yago:type)
-			else if(target.mayType && target.tmList != null)
-			{
-				String typeName = target.tmList.get(0).typeName;
-				String subName = "?" + target.originalForm;
-				//System.out.println("typeName="+typeName+" subName="+subName);
-				Triple triple =	new Triple(Triple.VAR_ROLE_ID, subName, Globals.pd.typePredicateID, Triple.TYPE_ROLE_ID, typeName, null, 100);
-				Sparql sparql = new Sparql();
-				sparql.addTriple(triple);
-				qlog.rankedSparqls.add(sparql);
 			}
 		}
 	}

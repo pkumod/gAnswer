@@ -1,10 +1,11 @@
 package qa;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import nlp.ds.Sentence;
-import qa.extract.EntityRecognition;
-import rdf.MergedWord;
+import nlp.ds.Word;
+import qa.extract.EntityRecognitionCh;
 
 /**
  * 1. preprocessing of question
@@ -21,7 +22,7 @@ public class Query
 	public String queryId = null;
 	public String preLog = "";
 	
-	public ArrayList<MergedWord> mWordList = null;
+	public List<Word> words = null;
 	
 	public Query(){}
 	public Query(String _question)
@@ -32,15 +33,17 @@ public class Query
 		TransferedQuestion = getTransferedQuestion(NLQuestion);	
 		
 		// step1. NODE Recognition
-		MergedQuestionList = getMergedQuestionList(TransferedQuestion);
+//		MergedQuestionList = getMergedQuestionList(TransferedQuestion);
+		words = EntityRecognitionCh.parseSentAndRecogEnt(TransferedQuestion);
 		
 		// build Sentence
 		sList = new ArrayList<Sentence>();
-		for(String mergedQuestion: MergedQuestionList)
-		{
-			Sentence sentence = new Sentence(this, mergedQuestion);
-			sList.add(sentence);
-		}
+		sList.add(new Sentence(words, TransferedQuestion)); // TODO: TransferedQuestion or _question
+//		for(String mergedQuestion: MergedQuestionList)
+//		{
+//			Sentence sentence = new Sentence(this, mergedQuestion);
+//			sList.add(sentence);
+//		}
 	}
 	
 	public boolean isDigit(char ch)
@@ -66,6 +69,14 @@ public class Query
 	 */
 	public String getTransferedQuestion(String question)
 	{
+		//discard ? ! .
+		if(question.endsWith("？") || question.endsWith("。") || question.endsWith("！"))
+			question = question.substring(0, question.length()-1);
+		
+		//discard 《》 because stanford parser DO NOT recognize them. TODO: why?
+		question = question.replace("《", "").replace("》", "");
+		question = question.replace("“", "").replace("”", "");	// now just discard "" because they confuse the parser. 
+		
 		//rule1: discard ".", because "." and "_" will be disconnected by parser. Discard word tail's "'", which may pollutes NER
 		question = question.replace("' ", " ");
 		String [] words = question.split(" ");
@@ -84,45 +95,31 @@ public class Query
 			ret = ret.substring(0,ret.length()-1);
 		
 		ret = ret.replace("-", " ");
-		ret = ret.replace("in america", "in United States");
-		
-		//rule2: as well as -> and
-		ret = ret.replace("as well as", "and");
-		
-		//rule3: movie -> film
-		ret = ret.replace(" movie", " film");
-		ret = ret.replace(" movies", " films");
+
 		
 		return ret;
-	}
-	
-	/**
-	 * Recognize entity & type & literal in KB and replace " " in Phrases with "_"
-	 * @param question
-	 * @return merged question list
-	 */
-	public ArrayList<String> getMergedQuestionList(String question)
-	{
-		ArrayList<String> mergedQuestionList = null;
-		//entity & type recognize
-		EntityRecognition er = new EntityRecognition(); 
-		mergedQuestionList = er.process(question);
-		preLog = er.preLog;
-		mWordList = er.mWordList;
-
-		return mergedQuestionList;
 	}
 	
 	public String removeQueryId(String question)
 	{
 		String ret = question;
+		// case 1: 1\t
 		int st = question.indexOf("\t");
-		if(st!=-1 && question.length()>1 && question.charAt(0)>='0' && question.charAt(0)<='9')
+		if(st!=-1 && question.length()>4 && isDigit(question.charAt(0)))
 		{
 			queryId = question.substring(0,st);
 			ret = question.substring(st+1);
 			System.out.println("Extract QueryId :"+queryId);
 		}
+		// case 2: q1: | 1:
+		st = question.indexOf(":");
+		if(st!=-1 && st<6  && question.length()>4 && (isDigit(question.charAt(0)) ||question.startsWith("q")))
+		{
+			queryId = question.substring(0,st).replace("q", "");
+			ret = question.substring(st+1);
+			System.out.println("Extract QueryId :"+queryId);
+		}
+		
 		return ret;
 	}
 }

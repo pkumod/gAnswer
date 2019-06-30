@@ -2,10 +2,10 @@ package nlp.ds;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import qa.Globals;
 import qa.Query;
-import rdf.MergedWord;
 
 public class Sentence {
 	public String plainText = null;
@@ -18,40 +18,64 @@ public class Sentence {
 	public enum SentenceType {SpecialQuestion,GeneralQuestion,ImperativeSentence}
 	public SentenceType sentenceType = SentenceType.SpecialQuestion;
 	
-	public Sentence (String s) 
+//	public Sentence (String s) 
+//	{
+//		plainText = s;
+//		words = Globals.coreNLP.getTaggedWords(plainText);
+//		map = new HashMap<String, Word>();
+//		for (Word w : words)
+//			map.put(w.key, w);
+//	}
+	
+	// for tokenized sentence
+	public Sentence (List<Word> wordList, String s)
 	{
 		plainText = s;
-		words = Globals.coreNLP.getTaggedWords(plainText);
+		words = new Word[wordList.size()];
+		for(int i=0; i<wordList.size(); i++)
+			words[i] = wordList.get(i);
+		
 		map = new HashMap<String, Word>();
 		for (Word w : words)
 			map.put(w.key, w);
 	}
 	
-	public Sentence (Query query, String s)
-	{
-		plainText = s;
-		words = Globals.coreNLP.getTaggedWords(plainText);
-		// inherit NodeRecognition's information
-		for(Word word: words)
+//	public Sentence (Query query, String s)
+//	{
+//		plainText = s;
+//		words = Globals.coreNLP.getTaggedWords(plainText);
+//		// inherit NodeRecognition's information
+//		for(Word word: words)
+//		{
+//			for(MergedWord mWord: query.mWordList)
+//			{
+//				if(word.originalForm.equals(mWord.name))
+//				{
+//					word.mayLiteral = mWord.mayLiteral;
+//					word.mayEnt = mWord.mayEnt;
+//					word.mayType = mWord.mayType;
+//					word.mayCategory = mWord.mayCategory;
+//					word.tmList = mWord.tmList;
+//					word.emList = mWord.emList;
+//					word.category = mWord.category;
+//				}
+//			}
+//		}
+//		map = new HashMap<String, Word>();
+//		for (Word w : words)
+//			map.put(w.key, w);
+//	}
+
+	public String[] getWordsArr() {
+		String[] wordArr = new String[words.length];
+		int cnt = 0;
+		for(Word w: words)
 		{
-			for(MergedWord mWord: query.mWordList)
-			{
-				if(word.originalForm.equals(mWord.name))
-				{
-					word.mayLiteral = mWord.mayLiteral;
-					word.mayEnt = mWord.mayEnt;
-					word.mayType = mWord.mayType;
-					word.mayCategory = mWord.mayCategory;
-					word.tmList = mWord.tmList;
-					word.emList = mWord.emList;
-					word.category = mWord.category;
-				}
-			}
+			wordArr[cnt++] = w.originalForm;
 		}
-		map = new HashMap<String, Word>();
-		for (Word w : words)
-			map.put(w.key, w);
+		return wordArr;
 	}
+	
 	public ArrayList<Word> getWordsByString (String w) {
 		ArrayList<Word> ret = new ArrayList<Word>();
 		for (Word wo: words) {

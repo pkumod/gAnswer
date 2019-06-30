@@ -19,7 +19,6 @@ import log.QueryLogger;
 import fgmt.EntityFragment;
 import fgmt.TypeFragment;
 import nlp.ds.Word;
-import nlp.tool.CoreNLP;
 
 public class ExtractImplicitRelation {
 	
@@ -374,7 +373,7 @@ public class ExtractImplicitRelation {
 	
 	public static void main(String[] args) throws Exception {
 		
-		Globals.coreNLP = new CoreNLP();
+//		Globals.coreNLP = new CoreNLP();
 		Globals.pd = new ParaphraseDictionary();
 		try 
 		{

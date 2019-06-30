@@ -28,8 +28,6 @@ public class ExtractRelation {
 	public ArrayList<SimpleRelation> findRelationsBetweenTwoUnit(SemanticUnit su1, SemanticUnit su2, QueryLogger qlog)
 	{
 		DependencyTree T = qlog.s.dependencyTreeStanford;
-		if(qlog.isMaltParserUsed)
-			T = qlog.s.dependencyTreeMalt;
 		
 		DependencyTreeNode n1 = T.getNodeByIndex(su1.centerWord.position), n2 = T.getNodeByIndex(su2.centerWord.position);
 		ArrayList<DependencyTreeNode> shortestPath = T.getShortestNodePathBetween(n1,n2);
