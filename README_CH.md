@@ -64,7 +64,7 @@ http://[ip]:[port]/gSolve/?data={maxAnswerNum:1, maxSparqlNum:2, question:Who is
 
 
 ### 使用eclipse运行
-当您使用eclipse运行gAnswer系统时，只需要通过clone或者download获取工程源码，然后按正常步骤导入Eclipse工程，同时将lib中的jar包加入Build Path中即可。由于外部jar包过大，无法上传github，您可以从[此处](https://pan.baidu.com/s/1ZfdKDtuE6PLby1koEs6aFg)下载所有需要的外部jar包,提取码为ud2v
+当您使用eclipse运行gAnswer系统时，只需要通过clone或者download获取工程源码，然后按正常步骤导入Eclipse工程，同时将lib中的jar包加入Build Path中即可。由于外部jar包过大，无法上传github，您可以从[此处](https://pan.baidu.com/s/18IegmEgj02fF9KQFwaQr0g)下载所有需要的外部jar包,提取码为64jd
 这时，您同样需要下载解压dbpedia16.rar,并解压到工程文件根目录下的data文件夹中。与数据路径相关的参数，您可以在qa.Globals.localPath中找到
 
 ### 注意事项
