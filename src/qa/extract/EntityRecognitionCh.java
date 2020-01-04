@@ -122,7 +122,7 @@ public class EntityRecognitionCh {
 	{
 		long t0 = System.currentTimeMillis();
 		List<String> nent = FileUtil.readFile("data/pkubase/paraphrase/ccksminutf.txt");
-		List<String> mention2ent = FileUtil.readFile("data/pkubase/paraphrase/mini-mention2ent.txt");		
+		List<String> mention2ent = FileUtil.readFile("data/pkubase/paraphrase/pkubase-mention2ent.txt");		
 
 		entMap=new HashMap<>();
 		nentMap=new HashMap<>();
