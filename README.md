@@ -8,7 +8,8 @@ GAnswer系统是由北京大学计算机技术研究所数据管理实验室邹�
 
 ## 快速开始
 这是GAnswer系统的中文问答版本，基于中文知识库PKUBASE。
-首先您需要从[此处](https://pan.baidu.com/s/1R3UTK3kRnGsFr0MjITOMEw)下载系统必需的数据文件pkubase.rar，提取码为tku6，您需要将其解压到data文件夹下。
+支持全量PKUBASE需要较大的内存(大于16G)，我们缺省提供了PKUBASE的一个非常小的子图，其相关文件存储在data/pkukbase文件夹下，只涉及CCKS 2019相关问题所需的三元组。
+若您希望QA系统建立在全量PKUBASE上，需要从[此处](https://pan.baidu.com/s/1R3UTK3kRnGsFr0MjITOMEw)下载系统必需的数据文件pkubase.rar，提取码为tku6，您需要将其解压后替换data文件夹内的文件。
 
 ### 使用jar包部署
 待更新。
