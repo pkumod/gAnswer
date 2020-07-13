@@ -9,6 +9,8 @@ This is an implementation for TKDE 2018 paper [Answering Natural Language Questi
 ## Quick Start
 First you must download necessary data files dbpedia16.rar [here](https://pan.baidu.com/s/1LHGO0cU5et5o5nQWc3UvVg). The extaction code is 1mcr. This is a Baidu Netdisk link. If you have trouble opening it, please try this google drive [link](https://drive.google.com/open?id=1hmqaftrTo0_qQNRApCuxFXaBx7SosNVy).You should unzip the file into directory named data.Since the complete data require at least 20 GB of main memory, you may try a [smaller dataset](https://pan.baidu.com/s/1Txe_cwpuoohJXH70yfxB-Q) (5GB required). The extract code is zuue. Please notice that the system performance is limited on the small data. We make sure that this data set is capable for example questions on our [official website](http://ganswer.gstore-pku.com/) as well as in QALD data set. Otherwise, you should choose suitable question for testing based on the data files.
 
+For those who want to set up their own gstore service, we also supply [dbpedia triple dataset](https://pan.baidu.com/s/1jQ_jGTniflzoqBhpz5tjnw) and the extract code is rpev.
+
 ### Deploy GAnswer via jar
 We recommend you to deploy GAnswer using the jar files we supply. The specific procedure is as follows：
 
