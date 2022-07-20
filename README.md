@@ -67,7 +67,7 @@ For more detail, please check Chapter 2.1.1 of the user guide.
 
 ### Run GAnswer in Eclipse
 If you would like to run GAnswer in Eclipse, you need to clone or download the source code and import the project into Eclipse. Afterwards, the jar files in lib directory should be added to Build Path.
-Due to the sizes, these jar files can not be uploaded to github. Therefore, you can download them [here](https://pan.baidu.com/s/18IegmEgj02fF9KQFwaQr0g). The extract code is 64jd. You can also download the lib zip through [Google Drive](https://drive.google.com/file/d/1tEsi4pBOBHd2gmwVgIOgt-ypJZQH9G3S).
+Due to the sizes, these jar files can not be uploaded to github. Therefore, you can download them [here](https://disk.pku.edu.cn:443/link/AD36D72C28B3A581379EE2748B1A79E7). The extract code is 64jd. You can also download the lib zip through [Google Drive](https://drive.google.com/file/d/1tEsi4pBOBHd2gmwVgIOgt-ypJZQH9G3S).
 Meanwhile, dbpedia16.rar is also needed. Please unzipped it into directory named data under the project main directory. Parameters about data path can be found in qa.Globals.localPath.
 
 ### Notice
